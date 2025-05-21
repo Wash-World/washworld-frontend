@@ -1,0 +1,18 @@
+.expo
+.vscode
+node_modules
+bun.lock
+bun.lockb
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Native
+*/ios/Pods
+
+# local env files
+*/.env*.local
+
+
+.DS_Store
+report.html
