@@ -1,0 +1,13 @@
+🌐 contexts/
+What goes here:
+React Context providers and logic for global app state.
+
+Examples:
+
+AuthContext.tsx – provides current user, login/logout functions
+
+ThemeContext.tsx – toggles dark/light mode
+
+WashFlowContext.tsx – tracks progress and data in wash flow
+
+LocationContext.tsx – current GPS location or selected pickup spot

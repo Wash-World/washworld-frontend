@@ -1,0 +1,12 @@
+What goes here:
+Custom React hooks — reusable logic abstracted out of components.
+
+Examples:
+
+useAuth.ts – checks login state or provides current user
+
+useForm.ts – shared form logic for handling input/validation
+
+useWashFlow.ts – maybe handles step transitions in wash flow
+
+useDebounce.ts – debounce a value before triggering API calls

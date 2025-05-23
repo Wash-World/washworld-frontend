@@ -1,0 +1,15 @@
+📝 types/
+What goes here:
+Global TypeScript types and interfaces.
+
+Examples:
+
+User.ts – interface User { id: string; email: string; }
+
+Wash.ts – type WashStatus = 'scheduled' | 'in_progress' | 'done'
+
+Navigation.ts – type-safe stack/tab param lists
+
+ApiResponse.ts – consistent API response shapes
+
+Tip: you can also create index.ts files that re-export everything in that folder, e.g. types/index.ts exports all your types.
