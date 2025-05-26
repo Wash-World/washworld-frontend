@@ -1,4 +1,4 @@
-const colors = {
+export const colors = {
   // Base
   white: "#FFFFFF",
   black: "#000000",
@@ -12,6 +12,7 @@ const colors = {
   // Grays
   gray80: "#333333", // 80%
   gray60: "#666666", // 60%
+  gray20: "#CCCCCC", // 20%
   gray10: "#E5E5E5", // 10%
   gray05: "#F7F7F7", // 5%
 
