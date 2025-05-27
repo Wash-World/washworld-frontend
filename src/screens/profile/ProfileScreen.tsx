@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const LocationScreen = () => {
+const ProfileScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Location Screen</Text>
+      <Text>Profile Screen</Text>
     </View>
   );
 };
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationScreen;
+export default ProfileScreen;

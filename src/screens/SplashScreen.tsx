@@ -1,10 +1,10 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, ActivityIndicator, StyleSheet } from "react-native";
 
-const LocationScreen = () => {
+const SplashScreen = () => {
   return (
     <View style={styles.container}>
-      <Text>Location Screen</Text>
+      <ActivityIndicator size="large" color="#007AFF" />
     </View>
   );
 };
@@ -18,4 +18,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LocationScreen;
+export default SplashScreen;
