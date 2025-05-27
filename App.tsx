@@ -1,11 +1,9 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { useState } from "react";
 import Select from "./src/components/elements/Select";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
-import Checkbox from "./src/components/elements/Checkbox";
+import Checkbox from "./src/components/elements/checkBox";
+
 
 export default function App() {
   // Location selection example
