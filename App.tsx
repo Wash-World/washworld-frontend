@@ -4,11 +4,10 @@ import { useState } from "react";
 import Select from "./src/components/elements/Select";
 
 export default function App() {
-
   // Location selection example
-  const [selectedLocation, setSelectedLocation] = useState("1");
+  const [selectedLocation, setSelectedLocation] = useState("");
 
-  // Fetched locations 
+  // Fetched locations
   const locations = [
     { label: "København", value: "1" },
     { label: "Aarhus", value: "2" },
@@ -25,11 +24,12 @@ export default function App() {
       <Text style={styles.header}>Select dropdown example</Text>
 
       <Select
-        label="Choose location"
+        label="Location"
         selectedValue={selectedLocation}
         onValueChange={setSelectedLocation}
         options={locations}
         placeholder="Select a location"
+        disabled={false}
       />
 
       <Text style={styles.selectedValue}>Selected location id: {selectedLocation}</Text>

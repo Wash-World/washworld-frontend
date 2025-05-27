@@ -1,7 +1,7 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { Dropdown } from 'react-native-element-dropdown';
-import { colors } from '../../constants/colors'; // Adjust the import path as needed
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+import { Dropdown } from "react-native-element-dropdown";
+import { colors } from "../../constants/colors"; // Adjust the import path as needed
 
 type Option = {
   label: string;
@@ -14,6 +14,7 @@ type SelectProps = {
   onValueChange: (value: string) => void;
   options: Option[];
   placeholder?: string;
+  disabled?: boolean;
 };
 
 const Select: React.FC<SelectProps> = ({
@@ -22,6 +23,7 @@ const Select: React.FC<SelectProps> = ({
   onValueChange,
   options,
   placeholder,
+  disabled,
 }) => {
   return (
     <View style={styles.container}>
@@ -36,6 +38,7 @@ const Select: React.FC<SelectProps> = ({
         valueField="value"
         placeholder={placeholder}
         value={selectedValue}
+        disable={disabled}
         onChange={(item) => onValueChange(item.value)}
       />
     </View>
@@ -45,10 +48,11 @@ const Select: React.FC<SelectProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginVertical: 12,
-    width: '100%',
+    width: "100%",
   },
   label: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: "bold",
     marginBottom: 6,
     color: colors.black,
   },
@@ -61,7 +65,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   placeholderStyle: {
-    color: colors.white,
+    color: colors.black,
     fontSize: 16,
   },
   selectedTextStyle: {
