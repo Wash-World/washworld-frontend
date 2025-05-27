@@ -12,6 +12,7 @@ export const colors = {
   // Grays
   gray80: "#333333", // 80%
   gray60: "#666666", // 60%
+  gray40: "#999999", // 40%
   gray20: "#CCCCCC", // 20%
   gray10: "#E5E5E5", // 10%
   gray05: "#F7F7F7", // 5%
@@ -20,6 +21,8 @@ export const colors = {
   orange: "#FF6B06", // splash  orange(brand)
   error: "#FF3B30", // red error
 };
+
+export default colors;
 
 /**
  * How to use these colors in a React Native component:
