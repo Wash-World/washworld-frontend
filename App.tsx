@@ -2,7 +2,6 @@ import Select from "./src/components/elements/Select";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
-import Checkbox from "./src/components/elements/checkBox";
 
 
 export default function App() {
@@ -40,12 +39,6 @@ export default function App() {
 
       <Text style={styles.header}>Checkbox Example</Text>
 
-      <Checkbox
-        label="Free access to all car washes"
-        checked={agreed}
-        onChange={() => setAgreed(!agreed)}
-      />
-
       <Text style={styles.statusText}>
         Free access: {agreed ? "✅" : "❌"}
       </Text>
@@ -75,12 +68,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 16,
     justifyContent: "center",
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 24,
-    textAlign: "center",
   },
   statusText: {
     fontSize: 16,
