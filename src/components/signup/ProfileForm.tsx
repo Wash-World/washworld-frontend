@@ -53,10 +53,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ firstName, lastName, phone, e
     <InputField label="Password" placeholder="******" secureTextEntry={!showPwd} value={password} onChangeText={onChangePassword} icon={passwordIcon} onIconPress={onToggleShowPwd} error={errors.password} />
 
     <InputField label="Confirm password" placeholder="******" secureTextEntry={!showConfirm} value={confirm} onChangeText={onChangeConfirm} icon={confirmIcon} onIconPress={onToggleShowConfirm} error={errors.confirm} />
-
-    <TouchableOpacity style={styles.nextBtn} onPress={onNext}>
-      <Text style={styles.nextText}>Next</Text>
-    </TouchableOpacity>
   </ScrollView>
 );
 
