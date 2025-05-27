@@ -10,7 +10,7 @@ type Option = {
 
 type SelectProps = {
   label?: string;
-  selectedValue: string;
+  selectedValue: string | null;
   onValueChange: (value: string) => void;
   options: Option[];
   placeholder?: string;
