@@ -64,7 +64,6 @@ export default ProfileForm;
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     width: "100%",
   },
   heading: {
