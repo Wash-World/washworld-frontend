@@ -37,12 +37,6 @@ export default function App() {
 
       <Text style={styles.selectedValue}>Selected location id: {selectedLocation}</Text>
 
-      <Text style={styles.header}>Checkbox Example</Text>
-
-      <Text style={styles.statusText}>
-        Free access: {agreed ? "✅" : "❌"}
-      </Text>
-
       <StatusBar style="auto" />
     </View>
   );
