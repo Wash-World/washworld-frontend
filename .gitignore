@@ -13,6 +13,10 @@ package-lock.json
 # local env files
 */.env*.local
 
+# Ignore all .env files
+.env
+.env.*
+
 
 .DS_Store
 report.html

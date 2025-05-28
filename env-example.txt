@@ -1,0 +1,8 @@
+# 1. Create a file called ".env" and copy-paste this line:
+LAN_IP=192.168.x.x
+
+
+# 2. Update with the value of your local network IP address, before running the app.
+# required for connecting Expo app to backend
+# On macOS, find it with: ipconfig getifaddr en0
+# On Windows, find it with: ipconfig (look for IPv4 Address under your network adapter)

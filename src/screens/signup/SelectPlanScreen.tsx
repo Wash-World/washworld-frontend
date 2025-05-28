@@ -1,6 +1,12 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, ActivityIndicator, Text } from "react-native";
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 import MembershipCard from "../../components/elements/MemberchipCard";
@@ -11,8 +17,12 @@ import Checkbox from "../../components/elements/Checkbox";
 import Button from "../../components/elements/Button";
 import { useAppDispatch } from "../../store";
 import { setPlan } from "../../store/signupSlice";
+import { LAN_IP } from "../../constants/env";
 
-type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.SELECT_PLAN>;
+type Props = NativeStackScreenProps<
+  SignUpStackParamList,
+  typeof ROUTES.SIGNUP.SELECT_PLAN
+>;
 
 interface Membership {
   membership_id: number;
@@ -32,7 +42,9 @@ export default function SelectPlanScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState<number | null>(null);
 
-  const [locations, setLocations] = useState<{ label: string; value: string }[]>([]);
+  const [locations, setLocations] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [locLoading, setLocLoading] = useState(true);
 
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -51,7 +63,8 @@ export default function SelectPlanScreen({ navigation }: Props) {
   //     3. Under your Wi-Fi/Ethernet adapter, find “IPv4 Address”
   //        (e.g. 192.168.0.123) and use that as your LAN_IP.
   // Replace with your LAN IP for Expo Go:
-  const LAN_IP = "10.58.131.25";
+
+  // const LAN_IP = "10.58.131.25";§
 
   useEffect(() => {
     fetch(`http://${LAN_IP}:3000/memberships`)
@@ -70,7 +83,9 @@ export default function SelectPlanScreen({ navigation }: Props) {
 
   // Fetch locations from your WP endpoint
   useEffect(() => {
-    fetch("https://washworld.dk/wp-json/ww/v1/locations?country=da&cacheBuster=17461100")
+    fetch(
+      "https://washworld.dk/wp-json/ww/v1/locations?country=da&cacheBuster=17461100"
+    )
       .then((res) => res.json())
       .then((data: Location[]) => {
         setLocations(
@@ -92,7 +107,8 @@ export default function SelectPlanScreen({ navigation }: Props) {
     );
   }
   // determine currently selected plan
-  const currentPlan = memberships.find((m) => m.membership_id === activeId) || memberships[0];
+  const currentPlan =
+    memberships.find((m) => m.membership_id === activeId) || memberships[0];
 
   // extract service names for chips
   const activeServices = currentPlan.services.map((s) => s.name);
@@ -106,7 +122,14 @@ export default function SelectPlanScreen({ navigation }: Props) {
 
         <View style={styles.cardsRow}>
           {memberships.map((m) => (
-            <MembershipCard key={m.membership_id} plan={m.plan} price={m.price} durationWash={m.duration_wash} active={m.membership_id === activeId} onPress={() => setActiveId(m.membership_id)} />
+            <MembershipCard
+              key={m.membership_id}
+              plan={m.plan}
+              price={m.price}
+              durationWash={m.duration_wash}
+              active={m.membership_id === activeId}
+              onPress={() => setActiveId(m.membership_id)}
+            />
           ))}
         </View>
 
@@ -115,7 +138,14 @@ export default function SelectPlanScreen({ navigation }: Props) {
         <AllServiceChips activeServices={activeServices} />
         <Text style={styles.sectionTitle}>Where do you want to wash?</Text>
 
-        <Select label="Location" options={locations} selectedValue={selectedLocation ?? ""} onValueChange={setSelectedLocation} placeholder={agreeAll ? "All locations" : "Select a location"} disabled={agreeAll} />
+        <Select
+          label="Location"
+          options={locations}
+          selectedValue={selectedLocation ?? ""}
+          onValueChange={setSelectedLocation}
+          placeholder={agreeAll ? "All locations" : "Select a location"}
+          disabled={agreeAll}
+        />
 
         <Checkbox
           label="Free access to all car washes with 10kr/month"
@@ -133,7 +163,9 @@ export default function SelectPlanScreen({ navigation }: Props) {
               dispatch(
                 setPlan({
                   membership_id: activeId!,
-                  assigned_location_api_id: agreeAll ? undefined : selectedLocation!,
+                  assigned_location_api_id: agreeAll
+                    ? undefined
+                    : selectedLocation!,
                   all_locations: agreeAll,
                 })
               );
