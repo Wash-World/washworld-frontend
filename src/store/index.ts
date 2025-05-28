@@ -4,6 +4,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import signupReducer from "./signupSlice";
+import authReducer from "./authSlice";
 
 //
 // 1) Create the store with your reducer(s)
@@ -11,6 +12,7 @@ import signupReducer from "./signupSlice";
 export const store = configureStore({
   reducer: {
     signup: signupReducer,
+    auth: authReducer,
     // you can add more slices here later
   },
 });

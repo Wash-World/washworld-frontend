@@ -40,21 +40,23 @@ export type SignUpStackParamList = {
   [ROUTES.SIGNUP.THANK_YOU]: undefined;
 };
 
-type Props = {
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
 const Stack = createNativeStackNavigator<SignUpStackParamList>();
 
-const SignUpNavigator = ({ setIsAuthenticated }: Props) => (
+const SignUpNavigator = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name={ROUTES.SIGNUP.SELECT_PLAN} component={SelectPlanScreen} />
+    <Stack.Screen
+      name={ROUTES.SIGNUP.SELECT_PLAN}
+      component={SelectPlanScreen}
+    />
 
-    <Stack.Screen name={ROUTES.SIGNUP.INSERT_INFO} component={InsertInfoScreen} />
+    <Stack.Screen
+      name={ROUTES.SIGNUP.INSERT_INFO}
+      component={InsertInfoScreen}
+    />
 
     <Stack.Screen name={ROUTES.SIGNUP.PAYMENT} component={CardPaymentScreen} />
 
-    <Stack.Screen name={ROUTES.SIGNUP.THANK_YOU}>{(navProps) => <ThankYouScreen {...navProps} setIsAuthenticated={setIsAuthenticated} />}</Stack.Screen>
+    <Stack.Screen name={ROUTES.SIGNUP.THANK_YOU} component={ThankYouScreen} />
   </Stack.Navigator>
 );
 

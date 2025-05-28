@@ -13,12 +13,14 @@ import SplashScreen from "../screens/SplashScreen";
 import AuthNavigator from "./AuthNavigator";
 import AppTabsNavigator from "./AppTabsNavigator";
 import { ROUTES } from "../constants/routes";
+import { useAppSelector } from "../store";
 
 const Stack = createNativeStackNavigator();
 
-// TODO: replace with value from Redux store
 const RootNavigator = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const token = useAppSelector((state) => state.auth.token);
+  const isAuthenticated = !!token;
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,9 +36,7 @@ const RootNavigator = () => {
         {isLoading ? (
           <Stack.Screen name={ROUTES.SPLASH} component={SplashScreen} />
         ) : !isAuthenticated ? (
-          <Stack.Screen name={ROUTES.AUTH_STACK}>
-            {() => <AuthNavigator setIsAuthenticated={setIsAuthenticated} />}
-          </Stack.Screen>
+          <Stack.Screen name={ROUTES.AUTH_STACK} component={AuthNavigator} />
         ) : (
           <Stack.Screen name={ROUTES.APP_TABS} component={AppTabsNavigator} />
         )}

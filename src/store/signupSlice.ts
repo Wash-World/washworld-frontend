@@ -45,7 +45,7 @@ export const submitSignup = createAsyncThunk(
       expiry_date: state.payment!.expiry_date,
       cvv: state.payment!.cvv,
     };
-    // const LAN_IP = "10.58.131.25";
+
     const res = await fetch(`http://${LAN_IP}:3000/users`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

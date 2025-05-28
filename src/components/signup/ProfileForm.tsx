@@ -1,5 +1,11 @@
 import React, { ReactNode } from "react";
-import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import InputField from "../elements/InputField";
 import colors from "../../constants/colors";
 
@@ -33,26 +39,91 @@ export interface ProfileFormProps {
   confirmIcon: ReactNode;
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({ firstName, lastName, phone, email, password, confirm, showPwd, showConfirm, errors, onChangeFirstName, onChangeLastName, onChangePhone, onChangeEmail, onChangePassword, onChangeConfirm, onToggleShowPwd, onToggleShowConfirm, onNext, passwordIcon, confirmIcon }) => (
+const ProfileForm: React.FC<ProfileFormProps> = ({
+  firstName,
+  lastName,
+  phone,
+  email,
+  password,
+  confirm,
+  showPwd,
+  showConfirm,
+  errors,
+  onChangeFirstName,
+  onChangeLastName,
+  onChangePhone,
+  onChangeEmail,
+  onChangePassword,
+  onChangeConfirm,
+  onToggleShowPwd,
+  onToggleShowConfirm,
+  onNext,
+  passwordIcon,
+  confirmIcon,
+}) => (
   <ScrollView contentContainerStyle={styles.container}>
     <Text style={styles.heading}>Your profile</Text>
 
     <View style={styles.row}>
       <View style={styles.half}>
-        <InputField label="Name" placeholder="John" value={firstName} onChangeText={onChangeFirstName} error={errors.firstName} />
+        <InputField
+          label="Name"
+          placeholder="John"
+          value={firstName}
+          onChangeText={onChangeFirstName}
+          error={errors.firstName}
+        />
       </View>
       <View style={styles.half}>
-        <InputField label="Last name" placeholder="Doe" value={lastName} onChangeText={onChangeLastName} error={errors.lastName} />
+        <InputField
+          label="Last name"
+          placeholder="Doe"
+          value={lastName}
+          onChangeText={onChangeLastName}
+          error={errors.lastName}
+        />
       </View>
     </View>
 
-    <InputField label="Mobile Number" placeholder="+45 123456789" value={phone} onChangeText={onChangePhone} error={errors.phone} />
+    <InputField
+      label="Mobile Number"
+      placeholder="+45 123456789"
+      value={phone}
+      onChangeText={onChangePhone}
+      error={errors.phone}
+    />
 
-    <InputField label="Email" placeholder="johndoe@email.com" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={onChangeEmail} error={errors.email} />
+    <InputField
+      label="Email"
+      placeholder="johndoe@email.com"
+      keyboardType="email-address"
+      autoCapitalize="none"
+      value={email}
+      onChangeText={onChangeEmail}
+      error={errors.email}
+    />
 
-    <InputField label="Password" placeholder="******" secureTextEntry={!showPwd} value={password} onChangeText={onChangePassword} icon={passwordIcon} onIconPress={onToggleShowPwd} error={errors.password} />
+    <InputField
+      label="Password"
+      placeholder="******"
+      secureTextEntry={!showPwd}
+      value={password}
+      onChangeText={onChangePassword}
+      icon={passwordIcon}
+      onIconPress={onToggleShowPwd}
+      error={errors.password}
+    />
 
-    <InputField label="Confirm password" placeholder="******" secureTextEntry={!showConfirm} value={confirm} onChangeText={onChangeConfirm} icon={confirmIcon} onIconPress={onToggleShowConfirm} error={errors.confirm} />
+    <InputField
+      label="Confirm password"
+      placeholder="******"
+      secureTextEntry={!showConfirm}
+      value={confirm}
+      onChangeText={onChangeConfirm}
+      icon={confirmIcon}
+      onIconPress={onToggleShowConfirm}
+      error={errors.confirm}
+    />
   </ScrollView>
 );
 

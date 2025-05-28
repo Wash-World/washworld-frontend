@@ -20,18 +20,18 @@ export type AuthStackParamList = {
   };
 };
 
-type AuthNavigatorProps = {
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const AuthNavigator = ({ setIsAuthenticated }: AuthNavigatorProps) => {
+const AuthNavigator = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
 
       <Stack.Screen name={ROUTES.SIGNUP.STACK}>
-        {() => <SignUpNavigator setIsAuthenticated={setIsAuthenticated} />}
+        {() => <SignUpNavigator />}
       </Stack.Screen>
+      {/* By rendering SignUpNavigator as a child, 
+      you're preventing TypeScript from enforcing screen props on it, 
+      that fixes the underlying type chain all the way down — including your ThankYouScreen. */}
+
       <Stack.Screen
         name={ROUTES.FORGOT_PASSWORD}
         component={ForgotPasswordScreen}
