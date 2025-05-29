@@ -39,13 +39,32 @@ export const loginUser = createAsyncThunk(
       }
 
       const data = await res.json(); // { user, access_token }
-      console.log("Login response:", data);
+      // console.log("Slice - Login response:", data);
 
       await SecureStore.setItemAsync("token", data.access_token); // Save token in SecureStore
+      console.log("Token saved to SecureStore:", data.access_token);
 
       return data;
     } catch (error: any) {
       return rejectWithValue(error.message || "Something went wrong");
+    }
+  }
+);
+
+export const fetchCurrentUser = createAsyncThunk(
+  "auth/fetchCurrentUser",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${LAN_IP}/users/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        return rejectWithValue("Failed to fetch user");
+      }
+      const user = await res.json();
+      return user;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch user");
     }
   }
 );
@@ -57,6 +76,9 @@ const authSlice = createSlice({
     setToken(state, action: PayloadAction<string>) {
       //simple action that updates state.token in the Redux store
       state.token = action.payload;
+    },
+    setUser(state, action: PayloadAction<any>) {
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -73,9 +95,16 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+      })
+      .addCase(fetchCurrentUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+      })
+      .addCase(fetchCurrentUser.rejected, (state) => {
+        state.user = null;
+        state.token = null;
       });
   },
 });
 
-export const { setToken } = authSlice.actions;
+export const { setToken, setUser } = authSlice.actions;
 export default authSlice.reducer;

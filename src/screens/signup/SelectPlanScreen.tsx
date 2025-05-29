@@ -1,12 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  Text,
-} from "react-native";
+import { View, ScrollView, StyleSheet, ActivityIndicator, Text } from "react-native";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 import MembershipCard from "../../components/elements/MemberchipCard";
@@ -18,11 +12,9 @@ import Button from "../../components/elements/Button";
 import { useAppDispatch } from "../../store";
 import { setPlan } from "../../store/signupSlice";
 import { LAN_IP } from "../../constants/env";
+import { useLocations } from "../../hooks/useLocations";
 
-type Props = NativeStackScreenProps<
-  SignUpStackParamList,
-  typeof ROUTES.SIGNUP.SELECT_PLAN
->;
+type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.SELECT_PLAN>;
 
 interface Membership {
   membership_id: number;
@@ -31,22 +23,17 @@ interface Membership {
   duration_wash: number;
   services: { service_id: number; name: string }[];
 }
-interface Location {
-  Location_id: string;
-  name: string;
+
+export interface LocationOption {
+  label: string;
+  value: string;
 }
+
 export default function SelectPlanScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
-
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeId, setActiveId] = useState<number | null>(null);
-
-  const [locations, setLocations] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [locLoading, setLocLoading] = useState(true);
-
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [agreeAll, setAgreeAll] = useState(false);
 
@@ -81,23 +68,12 @@ export default function SelectPlanScreen({ navigation }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  // Fetch locations from your WP endpoint
-  useEffect(() => {
-    fetch(
-      "https://washworld.dk/wp-json/ww/v1/locations?country=da&cacheBuster=17461100"
-    )
-      .then((res) => res.json())
-      .then((data: Location[]) => {
-        setLocations(
-          data.map((loc) => ({
-            label: loc.name,
-            value: loc.Location_id,
-          }))
-        );
-      })
-      .catch((err) => console.error("Location fetch error:", err))
-      .finally(() => setLocLoading(false));
-  }, []);
+  // const { data: locations = [], isLoading: locLoading } = useLocations();
+  const { data: locations = [], isLoading: locLoading } = useLocations();
+  const locationOptions = locations.map((loc) => ({
+    label: loc.name,
+    value: loc.Location_id,
+  }));
 
   if (loading || locLoading) {
     return (
@@ -106,9 +82,9 @@ export default function SelectPlanScreen({ navigation }: Props) {
       </View>
     );
   }
+
   // determine currently selected plan
-  const currentPlan =
-    memberships.find((m) => m.membership_id === activeId) || memberships[0];
+  const currentPlan = memberships.find((m) => m.membership_id === activeId) || memberships[0];
 
   // extract service names for chips
   const activeServices = currentPlan.services.map((s) => s.name);
@@ -140,7 +116,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
 
         <Select
           label="Location"
-          options={locations}
+          options={locationOptions}
           selectedValue={selectedLocation ?? ""}
           onValueChange={setSelectedLocation}
           placeholder={agreeAll ? "All locations" : "Select a location"}
@@ -163,9 +139,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
               dispatch(
                 setPlan({
                   membership_id: activeId!,
-                  assigned_location_api_id: agreeAll
-                    ? undefined
-                    : selectedLocation!,
+                  assigned_location_api_id: agreeAll ? undefined : selectedLocation!,
                   all_locations: agreeAll,
                 })
               );

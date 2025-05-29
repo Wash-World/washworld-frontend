@@ -8,6 +8,7 @@ import { ROUTES } from "../constants/routes";
 import { useAppDispatch, useAppSelector } from "../store";
 import { getToken } from "../hooks/secureStore";
 import { setToken } from "../store/authSlice";
+import { fetchCurrentUser } from "../store/authSlice";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,11 +23,22 @@ const RootNavigator = () => {
   // This runs once on app startup.
   useEffect(() => {
     const restoreAuth = async () => {
-      const savedToken = await getToken(); // 1. Fetch token from SecureStore
-      if (savedToken) {
-        dispatch(setToken(savedToken)); // 2. Put it back into Redux
+      try {
+        const savedToken = await getToken();
+        console.log(
+          "RestoreAuth - Token restored from SecureStore:",
+          savedToken
+        );
+        if (savedToken) {
+          dispatch(setToken(savedToken));
+          // fetch user profile if needed...
+        } else {
+          console.log("No token found");
+        }
+      } catch (error) {
+        console.error("Error restoring token:", error);
       }
-      setIsLoading(false); // 3. Stop showing the splash screen
+      setIsLoading(false);
     };
 
     restoreAuth();

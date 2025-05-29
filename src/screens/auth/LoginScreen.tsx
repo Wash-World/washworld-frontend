@@ -27,11 +27,12 @@ const LoginScreen = ({ navigation }: Props) => {
 
   const handleLogin = () => {
     dispatch(loginUser({ email, password }));
+    console.log("handleLogin - Token:", token);
   };
 
   useEffect(() => {
     console.log("Auth status:", status);
-    console.log("Token:", token);
+    console.log("useEffect - Token:", token);
     if (status === "succeeded" && token) {
       saveToken(token); // <-- Save the token securely
 
