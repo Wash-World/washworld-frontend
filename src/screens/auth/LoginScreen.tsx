@@ -14,6 +14,7 @@ import colors from "../../constants/colors";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { loginUser } from "../../store/authSlice";
 import { useEffect } from "react";
+import { saveToken } from "../../hooks/secureStore";
 
 type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.LOGIN>;
 
@@ -34,6 +35,8 @@ const LoginScreen = ({ navigation }: Props) => {
     console.log("Auth status:", status);
     console.log("Token:", token);
     if (status === "succeeded" && token) {
+      saveToken(token); // <-- Save the token securely
+
       navigation.reset({
         index: 0,
         routes: [{ name: ROUTES.APP_TABS }],

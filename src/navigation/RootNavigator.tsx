@@ -1,11 +1,3 @@
-// Entry point for our navigation based on authentication status
-// Checks if user is logged in
-// Renders splash → auth flow or main app. Decide here what to show!
-
-// 🔧 JWT Integration Note:
-// Later, you’ll read the JWT token from Redux (e.g. useSelector(state => state.auth.token))
-// and use that to determine isAuthenticated.
-
 import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -13,21 +5,31 @@ import SplashScreen from "../screens/SplashScreen";
 import AuthNavigator from "./AuthNavigator";
 import AppTabsNavigator from "./AppTabsNavigator";
 import { ROUTES } from "../constants/routes";
-import { useAppSelector } from "../store";
+import { useAppDispatch, useAppSelector } from "../store";
+import { getToken } from "../hooks/secureStore";
+import { setToken } from "../store/authSlice";
 
 const Stack = createNativeStackNavigator();
 
 const RootNavigator = () => {
-  const token = useAppSelector((state) => state.auth.token);
+  const dispatch = useAppDispatch(); // Gives you access to the Redux dispatch() function to manually update state.
+  const token = useAppSelector((state) => state.auth.token); // Reads the token from Redux using useAppSelector.
+  // This value resets when the app restarts — unless we restore it.
   const isAuthenticated = !!token;
 
   const [isLoading, setIsLoading] = useState(true);
 
+  // This runs once on app startup.
   useEffect(() => {
-    // Fake splash loading delay
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const restoreAuth = async () => {
+      const savedToken = await getToken(); // 1. Fetch token from SecureStore
+      if (savedToken) {
+        dispatch(setToken(savedToken)); // 2. Put it back into Redux
+      }
+      setIsLoading(false); // 3. Stop showing the splash screen
+    };
+
+    restoreAuth();
   }, []);
 
   return (

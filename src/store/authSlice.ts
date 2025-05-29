@@ -1,5 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { LAN_IP } from "../constants/env";
+import * as SecureStore from "expo-secure-store";
 
 // LoginDTO is needed because we send data in from the component.
 interface LoginDTO {
@@ -26,6 +27,7 @@ export const loginUser = createAsyncThunk(
   async (dto: LoginDTO, { rejectWithValue }) => {
     try {
       const res = await fetch(`http://${LAN_IP}:3000/auth/login`, {
+        //Makes API call
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dto),
@@ -36,7 +38,11 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue(err.message || "Failed to login");
       }
 
-      return await res.json(); // This should be { user, token }
+      const data = await res.json(); // { user, token }
+
+      await SecureStore.setItemAsync("token", data.access_token); // Save token in SecureStore
+
+      return data;
     } catch (error: any) {
       return rejectWithValue(error.message || "Something went wrong");
     }
@@ -46,7 +52,12 @@ export const loginUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    setToken(state, action: PayloadAction<string>) {
+      //simple action that updates state.token in the Redux store
+      state.token = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
@@ -54,7 +65,6 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log("Login success payload:", action.payload);
         state.status = "succeeded";
         state.user = action.payload.user;
         state.token = action.payload.access_token;
@@ -66,4 +76,5 @@ const authSlice = createSlice({
   },
 });
 
+export const { setToken } = authSlice.actions;
 export default authSlice.reducer;
