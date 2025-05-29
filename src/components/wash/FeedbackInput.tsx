@@ -27,8 +27,7 @@ const FeedbackInput: React.FC<FeedbackInputProps> = ({ text, onChangeText, onSen
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: colors.gray05,
+    padding: 0,
   },
   title: {
     fontSize: 20,
