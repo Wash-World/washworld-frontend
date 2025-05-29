@@ -22,8 +22,6 @@ const LoginScreen = ({ navigation }: Props) => {
   const dispatch = useAppDispatch();
   const { status, error, token } = useAppSelector((state) => state.auth);
 
-  const state = useAppSelector((state) => state);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
