@@ -15,8 +15,8 @@ import { ROUTES } from "../constants/routes";
 export type WashStackParamList = {
   [ROUTES.WASH.WAIT]: undefined;
   [ROUTES.WASH.SELECT]: { locationId: string };
-  [ROUTES.WASH.IN_PROGRESS]: { washHistoryId: number };
-  [ROUTES.WASH.FEEDBACK]: { washHistoryId: number };
+  [ROUTES.WASH.IN_PROGRESS]: { washHistoryId: number; locationId: string };
+  [ROUTES.WASH.FEEDBACK]: { washHistoryId: number; locationId: string };
   [ROUTES.WASH.FEEDBACK_DETAILS]: { feedbackId: number };
   [ROUTES.WASH.THANK_YOU]: undefined;
 };
@@ -25,7 +25,6 @@ const Stack = createNativeStackNavigator<WashStackParamList>();
 
 const WashNavigator: React.FC = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
-    {/* 2. The six screens in order */}
     <Stack.Screen name={ROUTES.WASH.WAIT} component={WashWaitScreen} />
     <Stack.Screen name={ROUTES.WASH.SELECT} component={SelectWashScreen} />
     <Stack.Screen name={ROUTES.WASH.IN_PROGRESS} component={WashInProgressScreen} />

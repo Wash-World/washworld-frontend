@@ -7,15 +7,8 @@ import { ROUTES } from "../../constants/routes";
 import { WashStackParamList } from "../../navigation/WashNavigator";
 import colors from "../../constants/colors";
 
-type Location = {
-  name: string;
-  Location_id: string;
-};
-
-type SelectOption = {
-  label: string;
-  value: string;
-};
+type Location = { name: string; Location_id: string };
+type SelectOption = { label: string; value: string };
 
 type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.WAIT>;
 
@@ -24,7 +17,6 @@ export default function WashWaitScreen({ navigation }: Props) {
   const [locations, setLocations] = useState<SelectOption[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 1️⃣ Fetch locations
   useEffect(() => {
     fetch("https://washworld.dk/wp-json/ww/v1/locations?country=da&cacheBuster=17461100")
       .then((res) => res.json())
@@ -43,7 +35,6 @@ export default function WashWaitScreen({ navigation }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  // 2️⃣ Pick a location
   const location = useMemo(() => {
     if (loading) return null;
     if (!user.all_locations && user.assigned_location_api_id) {
@@ -56,18 +47,16 @@ export default function WashWaitScreen({ navigation }: Props) {
     return { label: "Unknown Location", value: "" };
   }, [loading, locations, user]);
 
-  // 3️⃣ After 10s, go to SelectWash
   useEffect(() => {
     if (!location) return;
     const timer = setTimeout(() => {
       navigation.replace(ROUTES.WASH.SELECT, {
         locationId: location.value,
       });
-    }, 5_000);
+    }, 10_000);
     return () => clearTimeout(timer);
   }, [navigation, location]);
 
-  // Loading spinner
   if (loading || !location) {
     return (
       <View style={styles.center}>
@@ -76,17 +65,15 @@ export default function WashWaitScreen({ navigation }: Props) {
     );
   }
 
-  // Main UI
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
         <Text style={styles.locationName}>{location.label}</Text>
         <Text style={styles.locationAddress}>{location.value}</Text>
       </View>
-
       <View style={styles.body}>
         <Feather name="refresh-cw" size={64} color={colors.gray40} />
-        <Text style={styles.waitText}>Waiting for your card plate to be read…</Text>
+        <Text style={styles.waitText}>Waiting for your car plate to be written…</Text>
       </View>
     </View>
   );
