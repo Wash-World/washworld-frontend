@@ -26,8 +26,8 @@ export const ROUTES = {
   // 🧼 Wash Stack
   WASH: {
     STACK: "WashStack",
+    WAIT: "WashWait",
     SELECT: "SelectWash",
-    SUMMARY: "WashSummary",
     IN_PROGRESS: "WashInProgress",
     FEEDBACK: "WashFeedback",
     FEEDBACK_DETAILS: "FeedbackDetails",
