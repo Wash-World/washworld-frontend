@@ -1,15 +1,19 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import RootNavigator from "./src/navigation/RootNavigator";
 import { Provider } from "react-redux";
 import { store } from "./src/store";
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './src/services/queryClient';
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <RootNavigator />
-      <StatusBar style="auto" />
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <RootNavigator />
+        <StatusBar style="auto" />
+      </Provider>
+    </QueryClientProvider>
   );
 }
 const styles = StyleSheet.create({
