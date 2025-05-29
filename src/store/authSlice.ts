@@ -38,7 +38,8 @@ export const loginUser = createAsyncThunk(
         return rejectWithValue(err.message || "Failed to login");
       }
 
-      const data = await res.json(); // { user, token }
+      const data = await res.json(); // { user, access_token }
+      console.log("Login response:", data);
 
       await SecureStore.setItemAsync("token", data.access_token); // Save token in SecureStore
 
@@ -66,8 +67,8 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.user = action.payload.user;
-        state.token = action.payload.access_token;
+        state.user = action.payload.user; // save user info in Redux
+        state.token = action.payload.access_token; // save token in Redux
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
