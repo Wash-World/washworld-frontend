@@ -1,59 +1,17 @@
-// src/screens/wash/WashFeedbackScreen.tsx
-
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, SafeAreaView } from "react-native";
+import React from "react";
+import { View, Text, TouchableOpacity, ScrollView, Alert, ActivityIndicator, SafeAreaView, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useAppSelector } from "../../store";
 import { ROUTES } from "../../constants/routes";
 import { WashStackParamList } from "../../navigation/WashNavigator";
 import colors from "../../constants/colors";
-import { LAN_IP } from "../../constants/env";
+import { usePostFeedback } from "../../hooks/useFeedback";
 
 type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.FEEDBACK>;
 
 export default function WashFeedbackScreen({ route, navigation }: Props) {
   const { washHistoryId } = route.params;
-  const token = useAppSelector((s) => s.auth.token);
-
-  const [loading, setLoading] = useState(false);
-
-  // send feedback, then navigate to either THANK_YOU or FEEDBACK_DETAILS
-  const send = async (rating: number, comment: string, nextRoute: typeof ROUTES.WASH.THANK_YOU | typeof ROUTES.WASH.FEEDBACK_DETAILS) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`http://${LAN_IP}:3000/feedbacks`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          wash_history_id: washHistoryId,
-          rating,
-          comment,
-        }),
-      });
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || res.statusText);
-      }
-      const created = await res.json(); // { feedback_id, ... }
-      setLoading(false);
-
-      if (nextRoute === ROUTES.WASH.THANK_YOU) {
-        navigation.replace(ROUTES.WASH.THANK_YOU);
-      } else {
-        navigation.replace(ROUTES.WASH.FEEDBACK_DETAILS, {
-          feedbackId: created.feedback_id,
-        });
-      }
-    } catch (err: any) {
-      console.error("Feedback error:", err);
-      setLoading(false);
-      Alert.alert("Error", "Could not send feedback. Please try again.");
-    }
-  };
+  const { mutateAsync: postFeedback, isLoading } = usePostFeedback();
 
   const options = [
     {
@@ -85,13 +43,32 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
     },
   ];
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" color={colors.greenBrand} />
       </SafeAreaView>
     );
   }
+
+  const onSelect = async (rating: number, comment: string, nextRoute: typeof ROUTES.WASH.THANK_YOU | typeof ROUTES.WASH.FEEDBACK_DETAILS) => {
+    try {
+      const { feedback_id } = await postFeedback({
+        wash_history_id: washHistoryId,
+        rating,
+        comment,
+      });
+
+      if (nextRoute === ROUTES.WASH.FEEDBACK_DETAILS) {
+        navigation.replace(nextRoute, { feedbackId: feedback_id });
+      } else {
+        navigation.replace(nextRoute);
+      }
+    } catch (err: any) {
+      console.error("Feedback error:", err);
+      Alert.alert("Error", "Could not send feedback. Please try again.");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -100,7 +77,7 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
         <Text style={styles.subheader}>We’d love to hear your feedback. Tell us how it went — your feedback helps us improve.</Text>
 
         {options.map((opt) => (
-          <TouchableOpacity key={opt.title} style={[styles.card, { borderColor: opt.color }]} activeOpacity={0.8} onPress={() => send(opt.rating, opt.comment, opt.next)}>
+          <TouchableOpacity key={opt.title} style={[styles.card, { borderColor: opt.color }]} activeOpacity={0.8} onPress={() => onSelect(opt.rating, opt.comment, opt.next)}>
             <View style={styles.headerRow}>
               <Text style={[styles.title, { color: opt.color }]}>{opt.title}</Text>
               <MaterialIcons name={opt.icon} size={24} color={opt.color} />
@@ -121,9 +98,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  container: {
-    padding: 16,
-  },
+  container: { padding: 16 },
   header: {
     fontSize: 18,
     fontWeight: "bold",

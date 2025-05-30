@@ -1,55 +1,20 @@
-// src/screens/wash/FeedbackDetailsScreen.tsx
-
 import React, { useState } from "react";
-import { View, Text, Alert, ActivityIndicator, StyleSheet, ScrollView, SafeAreaView } from "react-native";
+import { View, Alert, ActivityIndicator, StyleSheet, ScrollView, SafeAreaView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useAppSelector } from "../../store";
 import { ROUTES } from "../../constants/routes";
 import { WashStackParamList } from "../../navigation/WashNavigator";
 import FeedbackInput from "../../components/wash/FeedbackInput";
 import colors from "../../constants/colors";
-import { LAN_IP } from "../../constants/env";
+import { usePatchFeedback } from "../../hooks/useFeedback";
 
 type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.FEEDBACK_DETAILS>;
 
 export default function FeedbackDetailsScreen({ route, navigation }: Props) {
-  const { feedbackId, locationName, locationAddress } = route.params;
-  const token = useAppSelector((s) => s.auth.token);
-
+  const { feedbackId } = route.params;
   const [text, setText] = useState("");
-  const [loading, setLoading] = useState(false);
+  const { mutateAsync: patchFeedback, isLoading } = usePatchFeedback();
 
-  const onSendFeedback = async () => {
-    if (!text.trim()) {
-      return Alert.alert("Feedback required", "Please tell us what went wrong.");
-    }
-    setLoading(true);
-
-    try {
-      // PATCH the feedback record with only the comment
-      const res = await fetch(`http://${LAN_IP}:3000/feedbacks/${feedbackId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ comment: text }),
-      });
-      if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || res.statusText);
-      }
-
-      setLoading(false);
-      navigation.replace(ROUTES.WASH.THANK_YOU);
-    } catch (err: any) {
-      console.error("FeedbackDetails error:", err);
-      setLoading(false);
-      Alert.alert("Error", "Could not send feedback. Please try again.");
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={colors.greenBrand} />
@@ -57,42 +22,31 @@ export default function FeedbackDetailsScreen({ route, navigation }: Props) {
     );
   }
 
+  const onSendFeedback = async () => {
+    if (!text.trim()) {
+      return Alert.alert("Feedback required", "Please tell us what went wrong.");
+    }
+    try {
+      await patchFeedback({ feedbackId, comment: text });
+      navigation.replace(ROUTES.WASH.THANK_YOU);
+    } catch (err: any) {
+      console.error("Patch feedback error:", err);
+      Alert.alert("Error", "Could not send feedback. Please try again.");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.screen}>
-      {/* Header bar */}
-      <View style={styles.header}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <FeedbackInput text={text} onChangeText={setText} onSendFeedback={onSendFeedback} />
-        </ScrollView>
-      </View>
+      <ScrollView contentContainerStyle={styles.content}>
+        <FeedbackInput text={text} onChangeText={setText} onSendFeedback={onSendFeedback} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.white },
-  header: {
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-  },
-  content: {
-    paddingTop: 8,
-    paddingHorizontal: 16,
-    paddingBottom: 100,
-  },
-  screenTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.greenBrand,
-    marginBottom: 8,
-  },
-  screenSubtitle: {
-    fontSize: 14,
-    color: colors.gray80,
-    lineHeight: 20,
-    marginBottom: 24,
-  },
+  content: { padding: 16, paddingBottom: 100 },
   center: {
     flex: 1,
     backgroundColor: colors.white,
