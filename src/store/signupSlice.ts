@@ -11,9 +11,20 @@ export interface SignupState {
     lastname: string;
     email: string;
     password: string;
+    confirm?:string; // Password confirmation (client-side only)
     mobile_num: string;
     carplate: string;
   };
+  // Validation errors for each profile field
+  validationErrors: Partial<{
+    name: string;
+    lastname: string;
+    email: string;
+    password: string;
+    confirm: string;
+    mobile_num: string;
+    carplate: string;
+  }>;
   payment?: {
     card_owner: string;
     card_number: string;
@@ -24,12 +35,27 @@ export interface SignupState {
   error?: string;
 }
 
-const initialState: SignupState = { status: "idle" };
+const initialState: SignupState = {
+  status: "idle",
+  validationErrors: {}, // No errors at the start
+  profile: {
+    name: "",
+    lastname: "",
+    email: "",
+    password: "",
+    confirm: "",
+    mobile_num: "",
+    carplate: "",
+  }, // Profile object exists but fields unset
+};
 
+// Async thunk to submit full signup DTO to backend
 export const submitSignup = createAsyncThunk(
   "signup/submit",
   async (_, thunkAPI) => {
+    // Select current signup state
     const state = (thunkAPI.getState() as any).signup as SignupState;
+    // Build DTO matching CreateUserDto with nested fields flattened
     const dto = {
       name: state.profile!.name,
       lastname: state.profile!.lastname,
@@ -64,7 +90,35 @@ export const submitSignup = createAsyncThunk(
 const signupSlice = createSlice({
   name: "signup",
   initialState,
-  reducers: {
+ reducers: {
+    // Update a single profile field and clear its validation error
+    updateField(
+      state,
+      action: PayloadAction<{ field: keyof NonNullable<SignupState['profile']>; value: string }>
+    ) {
+      const { field, value } = action.payload;
+      if (!state.profile) state.profile = {
+        name: "",
+        lastname: "",
+        email: "",
+        password: "",
+        confirm: "",
+        mobile_num: "",
+        carplate: "",
+      };
+      state.profile[field] = value;
+      delete state.validationErrors[field];
+    },
+
+    // Set all validation errors after running validators
+    setValidationErrors(
+      state,
+      action: PayloadAction<Partial<typeof state.validationErrors>>
+    ) {
+      state.validationErrors = action.payload;
+    },
+
+    // Bulk-set plan details
     setPlan(
       state,
       action: PayloadAction<{
@@ -101,6 +155,12 @@ const signupSlice = createSlice({
   },
 });
 
-export const { setPlan, setProfile, setPayment, resetSignup } =
-  signupSlice.actions;
+export const {
+  updateField,
+  setValidationErrors,
+  setPlan,
+  setProfile,
+  setPayment,
+  resetSignup,
+} = signupSlice.actions;
 export default signupSlice.reducer;
