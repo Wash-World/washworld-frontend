@@ -92,7 +92,7 @@ export default function SelectWashScreen({ route, navigation }: Props) {
         keyExtractor={(p) => p.membership_id.toString()}
         renderItem={({ item }) => {
           // 🚩 only allow if user is "All Inclusive" OR this is exactly their own plan
-          const isAllowed = user.membership_plan === "All Inclusive" || item.plan === user.membership_plan;
+          const isAllowed = user.membership_plan === "Brilliant" || item.plan === user.membership_plan;
 
           return (
             <MembershipCardWash
