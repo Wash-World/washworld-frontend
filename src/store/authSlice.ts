@@ -1,3 +1,4 @@
+//authSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { LAN_IP } from "../constants/env";
 import * as SecureStore from "expo-secure-store";
