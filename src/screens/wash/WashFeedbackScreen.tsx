@@ -1,7 +1,7 @@
 // src/screens/wash/WashFeedbackScreen.tsx
 
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator, SafeAreaView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAppSelector } from "../../store";
@@ -18,8 +18,8 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
 
   const [loading, setLoading] = useState(false);
 
-  // helper to send feedback and navigate
-  const send = async (rating: number, comment: string, nextRoute: string) => {
+  // send feedback, then navigate to either THANK_YOU or FEEDBACK_DETAILS
+  const send = async (rating: number, comment: string, nextRoute: typeof ROUTES.WASH.THANK_YOU | typeof ROUTES.WASH.FEEDBACK_DETAILS) => {
     setLoading(true);
     try {
       const res = await fetch(`http://${LAN_IP}:3000/feedbacks`, {
@@ -35,8 +35,8 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
         }),
       });
       if (!res.ok) {
-        const err = await res.text();
-        throw new Error(err || res.statusText);
+        const text = await res.text();
+        throw new Error(text || res.statusText);
       }
       const created = await res.json(); // { feedback_id, ... }
       setLoading(false);
@@ -44,7 +44,6 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
       if (nextRoute === ROUTES.WASH.THANK_YOU) {
         navigation.replace(ROUTES.WASH.THANK_YOU);
       } else {
-        // pass feedbackId to details screen
         navigation.replace(ROUTES.WASH.FEEDBACK_DETAILS, {
           feedbackId: created.feedback_id,
         });
@@ -56,7 +55,6 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
     }
   };
 
-  // Configuration for each option
   const options = [
     {
       title: "Great",
@@ -89,31 +87,34 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
 
   if (loading) {
     return (
-      <View style={styles.center}>
+      <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" color={colors.greenBrand} />
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>How was your wash?</Text>
-      <Text style={styles.subheader}>We’d love to hear your feedback. Tell us how it went — your feedback helps us improve.</Text>
+    <SafeAreaView style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>How was your wash?</Text>
+        <Text style={styles.subheader}>We’d love to hear your feedback. Tell us how it went — your feedback helps us improve.</Text>
 
-      {options.map((opt) => (
-        <TouchableOpacity key={opt.title} style={[styles.card, { borderColor: opt.color }]} activeOpacity={0.8} onPress={() => send(opt.rating, opt.comment, opt.next)}>
-          <View style={styles.headerRow}>
-            <Text style={[styles.title, { color: opt.color }]}>{opt.title}</Text>
-            <MaterialIcons name={opt.icon} size={24} color={opt.color} />
-          </View>
-          <Text style={styles.description}>{opt.description}</Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+        {options.map((opt) => (
+          <TouchableOpacity key={opt.title} style={[styles.card, { borderColor: opt.color }]} activeOpacity={0.8} onPress={() => send(opt.rating, opt.comment, opt.next)}>
+            <View style={styles.headerRow}>
+              <Text style={[styles.title, { color: opt.color }]}>{opt.title}</Text>
+              <MaterialIcons name={opt.icon} size={24} color={opt.color} />
+            </View>
+            <Text style={styles.description}>{opt.description}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.white },
   center: {
     flex: 1,
     backgroundColor: colors.white,
@@ -122,7 +123,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 16,
-    backgroundColor: colors.white,
   },
   header: {
     fontSize: 18,
