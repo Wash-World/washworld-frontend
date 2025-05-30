@@ -66,9 +66,9 @@ const LoginScreen = ({ navigation }: Props) => {
 
       {error && <Text style={styles.error}>{error}</Text>}
       {status === "loading" ? (
-        <ActivityIndicator />
+        <ActivityIndicator  testID="activity-indicator"/>
       ) : (
-        <Button title="Login" onPress={handleLogin} />
+        <Button title="Login"  testID="login-button" onPress={handleLogin} />
       )}
 
       <Button
