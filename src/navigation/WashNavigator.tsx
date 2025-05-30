@@ -12,8 +12,6 @@ import { ROUTES } from "../constants/routes";
 
 // 1. Define & export your stack’s param list
 
-// src/navigation/WashNavigator.tsx
-
 export type WashStackParamList = {
   [ROUTES.WASH.WAIT]: undefined;
   [ROUTES.WASH.SELECT]: {
