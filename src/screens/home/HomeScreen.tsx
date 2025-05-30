@@ -20,7 +20,7 @@ export default function HomeScreen() {
   const currentPlan = useMemo(() => plans.find((p) => p.plan === user.membership_plan), [plans, user.membership_plan]);
   const planPrice = currentPlan ? `${currentPlan.price},- kr` : "DKK 0,-";
 
-  // 2️⃣ Locations lookup (for favorites & history)
+  // 2️⃣ Locations lookup (for history)
   const { data: locations = [] } = useLocations();
   const nameById = useMemo(() => Object.fromEntries(locations.map((l) => [l.Location_id, l.name])) as Record<string, string>, [locations]);
 
@@ -39,12 +39,10 @@ export default function HomeScreen() {
         <Card>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>{user?.carplate || "No plate"}</Text>
-            <TouchableOpacity>
-              <Ionicons name="pencil" size={20} color={colors.gray80} />
-            </TouchableOpacity>
           </View>
-          <Text style={styles.cardSubtitle}>Last wash: {user?.lastWashDate || "—"}</Text>
-          <Text style={styles.cardHighlight}>You washed your car {user?.daysSinceWash || 0} days ago</Text>
+          <Text style={styles.cardSubtitle}>
+            Your location: <Text style={styles.locationNameText}>{user?.all_locations ? "All" : nameById[user.assigned_location_api_id] ?? `#${user.assigned_location_api_id}`}</Text>
+          </Text>
         </Card>
 
         {/* Your plan */}
@@ -58,7 +56,7 @@ export default function HomeScreen() {
               <Text style={styles.planPrice}>{planPrice}</Text>
             </View>
             <TouchableOpacity>
-              <Text style={styles.upgradeLink}>Want to upgrade?</Text>
+              <Text style={styles.upgradeLink}>Want to change plan?</Text>
             </TouchableOpacity>
           </Card>
         )}
@@ -86,17 +84,24 @@ export default function HomeScreen() {
           <Text style={styles.emptyText}>You haven’t washed yet.</Text>
         ) : (
           recent.map((w) => {
-            const date = new Date(w.timestamp).toLocaleString();
+            const dateOnly = new Date(w.timestamp).toLocaleDateString();
             const locName = nameById[w.location_api_id] || w.location_api_id;
-            // if your backend returned feedbacks relation:
-            const rating = w.feedbacks?.[0]?.rating;
+            const rating = w.feedbacks?.[0]?.rating ?? 0;
+
+            // Border color by rating
+            const borderColor = rating >= 4 ? colors.greenBrand : rating >= 2 ? colors.orange : colors.error;
+
             return (
-              <Card key={w.wash_history_id}>
+              <Card key={w.wash_history_id} style={{ borderColor, borderWidth: 2 }}>
                 <View style={styles.cardHeader}>
                   <Text style={styles.cardTitle}>{locName}</Text>
-                  <Text style={styles.cardSubtitleSmall}>{date}</Text>
+                  <Text style={styles.cardSubtitleSmall}>{dateOnly}</Text>
                 </View>
-                {rating != null && <Text style={styles.ratingText}>Your rating: {rating} / 5</Text>}
+                <View style={styles.starsRow}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Ionicons key={i} name="star" size={16} color={i < rating ? colors.greenBrand : colors.gray40} />
+                  ))}
+                </View>
               </Card>
             );
           })
@@ -137,19 +142,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: 16, fontWeight: "600" },
   cardSubtitle: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.gray60,
-    marginTop: 4,
+    marginTop: 8,
   },
   cardSubtitleSmall: {
     fontSize: 12,
     color: colors.gray60,
-  },
-  cardHighlight: {
-    marginTop: 8,
-    fontSize: 14,
-    color: colors.greenBrand,
-    fontWeight: "500",
   },
 
   planPrice: { fontSize: 16, fontWeight: "600" },
@@ -165,11 +164,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  ratingText: {
+  starsRow: {
+    flexDirection: "row",
     marginTop: 8,
-    fontSize: 14,
-    fontWeight: "500",
-    color: colors.gray80,
+  },
+  locationNameText: {
+    color: colors.greenBrand,
+    fontWeight: "600",
   },
 
   errorText: {
