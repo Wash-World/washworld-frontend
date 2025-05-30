@@ -30,11 +30,12 @@ export type WashStackParamList = {
     membershipId: number;
     durationWash: number;
   };
-  [ROUTES.WASH.FEEDBACK]: {
-    washHistoryId: number;
-    locationId: string;
+  [ROUTES.WASH.FEEDBACK]: { washHistoryId: number; locationId: string };
+  [ROUTES.WASH.FEEDBACK_DETAILS]: {
+    feedbackId: number;
+    locationName: string;
+    locationAddress: string;
   };
-  [ROUTES.WASH.FEEDBACK_DETAILS]: { feedbackId: number };
   [ROUTES.WASH.THANK_YOU]: undefined;
 };
 
