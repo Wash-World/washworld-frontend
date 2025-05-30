@@ -8,15 +8,32 @@ import WashInProgressScreen from "../screens/wash/WashInProgressScreen";
 import WashFeedbackScreen from "../screens/wash/WashFeedbackScreen";
 import FeedbackDetailsScreen from "../screens/wash/FeedbackDetailsScreen";
 import WashThankYouScreen from "../screens/wash/WashThankYouScreen";
-
 import { ROUTES } from "../constants/routes";
 
 // 1. Define & export your stack’s param list
+
+// src/navigation/WashNavigator.tsx
+
 export type WashStackParamList = {
   [ROUTES.WASH.WAIT]: undefined;
-  [ROUTES.WASH.SELECT]: { locationId: string };
-  [ROUTES.WASH.IN_PROGRESS]: { washHistoryId: number; locationId: string };
-  [ROUTES.WASH.FEEDBACK]: { washHistoryId: number; locationId: string };
+  [ROUTES.WASH.SELECT]: {
+    locationId: string;
+    locationName: string;
+    locationAddress: string;
+    hallsCount: number;
+  };
+  [ROUTES.WASH.IN_PROGRESS]: {
+    locationId: string;
+    locationName: string;
+    locationAddress: string;
+    hallsCount: number;
+    membershipId: number;
+    durationWash: number;
+  };
+  [ROUTES.WASH.FEEDBACK]: {
+    washHistoryId: number;
+    locationId: string;
+  };
   [ROUTES.WASH.FEEDBACK_DETAILS]: { feedbackId: number };
   [ROUTES.WASH.THANK_YOU]: undefined;
 };

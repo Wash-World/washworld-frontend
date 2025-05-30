@@ -14,32 +14,23 @@ export interface MembershipCardProps {
   onPress: () => void;
 }
 
-const MembershipCardWash: React.FC<MembershipCardProps> = ({
-  plan,
-  durationWash,
-  active,
-  onPress,
-}) => (
+const MembershipCardWash: React.FC<MembershipCardProps> = ({ plan, durationWash, active, onPress }) => (
   // TouchableOpacity gives us press feedback.
-// We merge the base card style with either the active or inactive border.
+  // We merge the base card style with either the active or inactive border.
   <TouchableOpacity
     style={[styles.card, active ? styles.cardActive : styles.cardInactive]}
     onPress={onPress}
     activeOpacity={0.8} // slightly dim on press
   >
     {/* Plan name & Price */}
-     <View style={styles.headerRow}>
-      <Text style={[styles.planLabel, active && styles.planLabelActive]}>
-        {plan}
-      </Text>
+    <View style={styles.headerRow}>
+      <Text style={[styles.planLabel, active && styles.planLabelActive]}>{plan}</Text>
 
       <Text style={[styles.priceText, active && styles.priceTextActive]}>0,- kr</Text>
     </View>
 
     {/* Duration in minutes */}
-    <Text style={[styles.durationText, active && styles.durationTextActive]}>
-      {durationWash} minutes
-    </Text>
+    <Text style={[styles.durationText, active && styles.durationTextActive]}>{durationWash} minutes</Text>
   </TouchableOpacity>
 );
 
@@ -47,12 +38,12 @@ export default MembershipCardWash;
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1, // allow cards to share available space
-    marginHorizontal: 4, // space between cards
+    width: "100%",
+    marginVertical: 8, // ← adds space above & below each card
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-     // center text horizontally - alignItems: "center",
+    backgroundColor: colors.white,
   },
   // Green border when active
   cardActive: {
@@ -62,7 +53,7 @@ const styles = StyleSheet.create({
   cardInactive: {
     borderColor: colors.gray20,
   },
-   headerRow: {
+  headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -70,18 +61,18 @@ const styles = StyleSheet.create({
   },
   planLabel: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.gray80,
     marginBottom: 8,
-     textAlign: "left",
+    textAlign: "left",
   },
   // Make the plan label green when active
   planLabelActive: {
     color: colors.greenBrand,
   },
-    priceText: {
+  priceText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: colors.black,
   },
   priceTextActive: {
@@ -97,4 +88,3 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
 });
-

@@ -1,63 +1,66 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useEffect } from "react";
 import { View, Text, StyleSheet, ActivityIndicator, Alert } from "react-native";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Feather } from "@expo/vector-icons";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useQuery } from "@tanstack/react-query";
+import type { Location } from "../../services/types/location";
+import { fetchLocations } from "../../services/api/locations";
 import { useAppSelector } from "../../store";
 import { ROUTES } from "../../constants/routes";
 import { WashStackParamList } from "../../navigation/WashNavigator";
 import colors from "../../constants/colors";
 
-type Location = { name: string; Location_id: string };
-type SelectOption = { label: string; value: string };
+type SelectInfo = {
+  label: string;
+  value: string;
+  halls: number;
+};
 
 type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.WAIT>;
 
 export default function WashWaitScreen({ navigation }: Props) {
   const user = useAppSelector((s) => s.auth.user);
-  const [locations, setLocations] = useState<SelectOption[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("https://washworld.dk/wp-json/ww/v1/locations?country=da&cacheBuster=17461100")
-      .then((res) => res.json())
-      .then((data: Location[]) => {
-        setLocations(
-          data.map((loc) => ({
-            label: loc.name,
-            value: loc.Location_id,
-          }))
-        );
-      })
-      .catch((err) => {
-        console.error("Location fetch error:", err);
-        Alert.alert("Error", "Could not load locations; using defaults.");
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  // 1. Fetch & map locations (errors fall through to data = [])
+  const { data: options = [], isLoading } = useQuery<SelectInfo[], Error>({
+    queryKey: ["locations", user.id],
+    queryFn: async () => {
+      const raw: Location[] = await fetchLocations();
+      return raw.map((loc) => ({
+        label: loc.name,
+        value: loc.Location_id,
+        halls: loc.service_units.hall.total_count,
+      }));
+    },
+  });
 
-  const location = useMemo(() => {
-    if (loading) return null;
+  // 2. Choose either the user's single location or a random one
+  const chosen = useMemo<SelectInfo | null>(() => {
+    if (isLoading) return null;
+
     if (!user.all_locations && user.assigned_location_api_id) {
-      return locations.find((l) => l.value === user.assigned_location_api_id) || locations[0];
+      return options.find((o) => o.value === user.assigned_location_api_id) || options[0] || { label: "Unknown", value: "", halls: 0 };
     }
-    if (locations.length) {
-      const idx = Math.floor(Math.random() * locations.length);
-      return locations[idx];
-    }
-    return { label: "Unknown Location", value: "" };
-  }, [loading, locations, user]);
 
+    return options.length ? options[Math.floor(Math.random() * options.length)] : { label: "Unknown", value: "", halls: 0 };
+  }, [isLoading, options, user.all_locations, user.assigned_location_api_id]);
+
+  // 3. After 10s navigate to the SELECT screen
   useEffect(() => {
-    if (!location) return;
-    const timer = setTimeout(() => {
+    if (!chosen) return;
+    const t = setTimeout(() => {
       navigation.replace(ROUTES.WASH.SELECT, {
-        locationId: location.value,
+        locationId: chosen.value,
+        locationName: chosen.label,
+        locationAddress: chosen.value,
+        hallsCount: chosen.halls,
       });
-    }, 10_000);
-    return () => clearTimeout(timer);
-  }, [navigation, location]);
+    }, 5_000);
+    return () => clearTimeout(t);
+  }, [navigation, chosen]);
 
-  if (loading || !location) {
+  // 4. Render spinner or chosen info
+  if (isLoading || !chosen) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={colors.greenBrand} />
@@ -68,12 +71,12 @@ export default function WashWaitScreen({ navigation }: Props) {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
-        <Text style={styles.locationName}>{location.label}</Text>
-        <Text style={styles.locationAddress}>{location.value}</Text>
+        <Text style={styles.locationName}>{chosen.label}</Text>
+        <Text style={styles.locationAddress}>{chosen.value}</Text>
       </View>
       <View style={styles.body}>
         <Feather name="refresh-cw" size={64} color={colors.gray40} />
-        <Text style={styles.waitText}>Waiting for your car plate to be written…</Text>
+        <Text style={styles.waitText}>Waiting for your car plate to be read…</Text>
       </View>
     </View>
   );
@@ -105,6 +108,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.gray60,
     marginTop: 4,
+  },
+  hallsCount: {
+    fontSize: 14,
+    color: colors.gray60,
+    marginTop: 4,
+    fontWeight: "600",
   },
   body: {
     flex: 1,
