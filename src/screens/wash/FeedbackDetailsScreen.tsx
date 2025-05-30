@@ -1,7 +1,7 @@
 // src/screens/wash/FeedbackDetailsScreen.tsx
 
 import React, { useState } from "react";
-import { View, Text, Alert, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Alert, ActivityIndicator, StyleSheet, ScrollView, SafeAreaView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useAppSelector } from "../../store";
 import { ROUTES } from "../../constants/routes";
@@ -58,21 +58,20 @@ export default function FeedbackDetailsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen}>
       {/* Header bar */}
       <View style={styles.header}>
         <ScrollView contentContainerStyle={styles.content}>
           <FeedbackInput text={text} onChangeText={setText} onSendFeedback={onSendFeedback} />
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.white },
   header: {
-    backgroundColor: colors.gray05,
     paddingTop: 40,
     paddingHorizontal: 16,
     paddingBottom: 16,
