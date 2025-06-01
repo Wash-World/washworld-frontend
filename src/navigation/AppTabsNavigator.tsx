@@ -18,9 +18,9 @@ export default function AppTabsNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        // default icon config
+
         tabBarIcon: ({ color, size }) => {
-          let iconName: React.ComponentProps<typeof Ionicons>["name"] = "home";
+          let iconName: React.ComponentProps<typeof Ionicons>["name"] = "home-outline";
 
           switch (route.name) {
             case ROUTES.HOME:
@@ -35,7 +35,6 @@ export default function AppTabsNavigator() {
             case ROUTES.PROFILE:
               iconName = "person-outline";
               break;
-            // WashStack will override below
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -48,19 +47,34 @@ export default function AppTabsNavigator() {
       <Tab.Screen name={ROUTES.HOME} component={HomeScreen} />
       <Tab.Screen name={ROUTES.LOCATION} component={LocationScreen} />
 
+      {/* ───────────────────────────────────────────────────────────────────────
+          For the “WashStack” tab, we add a `listeners` prop. 
+          Whenever the user presses this tab, we force‐navigate to the 
+          very first screen (“WashWaitScreen”) of that stack.
+      ─────────────────────────────────────────────────────────────────────── */}
       <Tab.Screen
         name={ROUTES.WASH.STACK}
         component={WashNavigator}
         options={{
-          // override the default icon with a custom W‐button
           tabBarIcon: () => (
             <View style={styles.washTabButton}>
               <Text style={styles.washTabText}>W</Text>
             </View>
           ),
-          // if you want it to sit slightly higher:
           tabBarItemStyle: { marginTop: -4 },
         }}
+        listeners={({ navigation }) => ({
+          // On each tabPress, reset the nested Wash stack to its initial route
+          tabPress: (e) => {
+            // Prevent default behavior (so we can explicitly drive navigation ourselves)
+            e.preventDefault();
+
+            // Navigate to the Wash stack's first screen (WashWaitScreen)
+            navigation.navigate(ROUTES.WASH.STACK, {
+              screen: ROUTES.WASH.WAIT,
+            });
+          },
+        })}
       />
 
       <Tab.Screen name={ROUTES.HELP} component={HelpScreen} />

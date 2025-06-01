@@ -1,4 +1,3 @@
-// src/navigation/WashNavigator.tsx
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -9,8 +8,6 @@ import WashFeedbackScreen from "../screens/wash/WashFeedbackScreen";
 import FeedbackDetailsScreen from "../screens/wash/FeedbackDetailsScreen";
 import WashThankYouScreen from "../screens/wash/WashThankYouScreen";
 import { ROUTES } from "../constants/routes";
-
-// 1. Define & export your stack’s param list
 
 export type WashStackParamList = {
   [ROUTES.WASH.WAIT]: undefined;
@@ -31,8 +28,6 @@ export type WashStackParamList = {
   [ROUTES.WASH.FEEDBACK]: { washHistoryId: number; locationId: string };
   [ROUTES.WASH.FEEDBACK_DETAILS]: {
     feedbackId: number;
-    locationName: string;
-    locationAddress: string;
   };
   [ROUTES.WASH.THANK_YOU]: undefined;
 };
