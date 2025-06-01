@@ -68,7 +68,6 @@ export default function SelectPlanScreen({ navigation }: Props) {
       .finally(() => setLoading(false));
   }, []);
 
-  // const { data: locations = [], isLoading: locLoading } = useLocations();
   const { data: locations = [], isLoading: locLoading } = useLocations();
   const locationOptions = locations.map((loc) => ({
     label: loc.name,
@@ -83,7 +82,6 @@ export default function SelectPlanScreen({ navigation }: Props) {
     );
   }
 
-  // determine currently selected plan
   const currentPlan = memberships.find((m) => m.membership_id === activeId) || memberships[0];
 
   // extract service names for chips
@@ -98,14 +96,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
 
         <View style={styles.cardsRow}>
           {memberships.map((m) => (
-            <MembershipCard
-              key={m.membership_id}
-              plan={m.plan}
-              price={m.price}
-              durationWash={m.duration_wash}
-              active={m.membership_id === activeId}
-              onPress={() => setActiveId(m.membership_id)}
-            />
+            <MembershipCard key={m.membership_id} plan={m.plan} price={m.price} durationWash={m.duration_wash} active={m.membership_id === activeId} onPress={() => setActiveId(m.membership_id)} />
           ))}
         </View>
 
@@ -114,14 +105,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
         <AllServiceChips activeServices={activeServices} />
         <Text style={styles.sectionTitle}>Where do you want to wash?</Text>
 
-        <Select
-          label="Location"
-          options={locationOptions}
-          selectedValue={selectedLocation ?? ""}
-          onValueChange={setSelectedLocation}
-          placeholder={agreeAll ? "All locations" : "Select a location"}
-          disabled={agreeAll}
-        />
+        <Select label="Location" options={locationOptions} selectedValue={selectedLocation ?? ""} onValueChange={setSelectedLocation} placeholder={agreeAll ? "All locations" : "Select a location"} disabled={agreeAll} />
 
         <Checkbox
           label="Free access to all car washes with 10kr/month"

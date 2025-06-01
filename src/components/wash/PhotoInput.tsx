@@ -1,4 +1,3 @@
-// src/components/wash/PhotoInput.tsx
 import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Feather } from "@expo/vector-icons";

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../constants/colors";
-
 import HomeScreen from "../screens/home/HomeScreen";
 import LocationScreen from "../screens/location/LocationScreen";
 import HelpScreen from "../screens/help/HelpScreen";
@@ -18,7 +17,7 @@ export default function AppTabsNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-
+        //added icons foe the tabs
         tabBarIcon: ({ color, size }) => {
           let iconName: React.ComponentProps<typeof Ionicons>["name"] = "home-outline";
 
@@ -48,9 +47,8 @@ export default function AppTabsNavigator() {
       <Tab.Screen name={ROUTES.LOCATION} component={LocationScreen} />
 
       {/* ───────────────────────────────────────────────────────────────────────
-          For the “WashStack” tab, we add a `listeners` prop. 
-          Whenever the user presses this tab, we force‐navigate to the 
-          very first screen (“WashWaitScreen”) of that stack.
+        there was an issue in the wash flow that when you have finished the wash and you were 
+        pressing agin the wash tab , you where in the thank you , thats why the listeners were added
       ─────────────────────────────────────────────────────────────────────── */}
       <Tab.Screen
         name={ROUTES.WASH.STACK}
@@ -66,9 +64,8 @@ export default function AppTabsNavigator() {
         listeners={({ navigation }) => ({
           // On each tabPress, reset the nested Wash stack to its initial route
           tabPress: (e) => {
-            // Prevent default behavior (so we can explicitly drive navigation ourselves)
+            // Prevent default behavior
             e.preventDefault();
-
             // Navigate to the Wash stack's first screen (WashWaitScreen)
             navigation.navigate(ROUTES.WASH.STACK, {
               screen: ROUTES.WASH.WAIT,

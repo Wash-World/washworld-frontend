@@ -115,7 +115,7 @@ export default function InsertInfoScreen({ navigation }: Props) {
         confirmIcon={confirmIcon}
         onNext={function (): void {
           throw new Error("Function not implemented.");
-        }} // NOTE: no onNext prop here—ProfileForm will render fields only
+        }}
       />
 
       <View style={styles.buttonWrapper}>

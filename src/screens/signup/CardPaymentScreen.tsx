@@ -1,4 +1,3 @@
-// src/screens/signup/CardPaymentScreen.tsx
 import React, { useState } from "react";
 import { ScrollView, SafeAreaView, StyleSheet, View, Alert, ActivityIndicator } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -16,7 +15,6 @@ export default function CardPaymentScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((s) => s.signup);
 
-  // 1) Local form state + errors
   const [owner, setOwner] = useState("");
   const [number, setNumber] = useState("");
   const [expiry, setExpiry] = useState("");
@@ -28,7 +26,6 @@ export default function CardPaymentScreen({ navigation }: Props) {
     cvv?: string;
   }>({});
 
-  // 2) Validation logic (unchanged)
   const validate = (): boolean => {
     const errs: typeof errors = {};
     if (!owner.trim()) errs.owner = "Insert a valid name";
@@ -43,11 +40,9 @@ export default function CardPaymentScreen({ navigation }: Props) {
     return Object.keys(errs).length === 0;
   };
 
-  // 3) Handler that dispatches payment + submitSignup
   const handlePay = async () => {
     if (!validate()) return;
 
-    // 3a) Save payment details
     dispatch(
       setPayment({
         card_owner: owner,
@@ -58,10 +53,7 @@ export default function CardPaymentScreen({ navigation }: Props) {
     );
 
     try {
-      // 3b) Call the thunk and wait for it to complete
       await dispatch(submitSignup()).unwrap();
-
-      // 3c) On success, clear slice and go to ThankYou
       dispatch(resetSignup());
       navigation.navigate(ROUTES.SIGNUP.THANK_YOU);
     } catch (err: any) {
@@ -69,7 +61,6 @@ export default function CardPaymentScreen({ navigation }: Props) {
     }
   };
 
-  // allow button only if fields nonempty
   const canProceed = owner.trim() !== "" && number.trim() !== "" && expiry.trim() !== "" && cvv.trim() !== "";
 
   return (

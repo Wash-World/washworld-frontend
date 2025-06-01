@@ -16,13 +16,10 @@ export default function SelectWashScreen({ route, navigation }: Props) {
   const { locationId, locationName, locationAddress, hallsCount } = route.params;
   const user = useAppSelector((s) => s.auth.user);
 
-  // 1️⃣ fetch via React-Query
   const { data: plans = [], isLoading, isError } = useMemberships();
 
-  // 2️⃣ track selected
   const [activeId, setActiveId] = useState<number | null>(null);
 
-  // 3️⃣ once plans arrive, pre-select
   useEffect(() => {
     if (!isLoading && plans.length && activeId === null) {
       const match = plans.find((p) => p.plan === user.membership_plan);
@@ -30,7 +27,6 @@ export default function SelectWashScreen({ route, navigation }: Props) {
     }
   }, [isLoading, plans, user.membership_plan, activeId]);
 
-  // 4️⃣ NEXT handler
   const onNext = () => {
     if (activeId == null) {
       return Alert.alert("Select a wash", "Please pick a plan first.");
@@ -46,7 +42,6 @@ export default function SelectWashScreen({ route, navigation }: Props) {
     });
   };
 
-  // 5️⃣ loading / error UIs
   if (isLoading) {
     return (
       <SafeAreaView style={styles.center}>
@@ -63,16 +58,13 @@ export default function SelectWashScreen({ route, navigation }: Props) {
     );
   }
 
-  // 6️⃣ render
   return (
     <SafeAreaView style={styles.screen}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.locationName}>{locationName}</Text>
         <Text style={styles.locationAddress}>{locationAddress}</Text>
       </View>
 
-      {/* Your info */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Your info</Text>
         <View style={styles.row}>
@@ -85,13 +77,12 @@ export default function SelectWashScreen({ route, navigation }: Props) {
         </View>
       </View>
 
-      {/* Select a wash */}
       <Text style={[styles.sectionTitle, styles.selectTitle]}>Select a wash</Text>
       <FlatList
         data={plans}
         keyExtractor={(p) => p.membership_id.toString()}
         renderItem={({ item }) => {
-          // 🚩 only allow if user is "All Inclusive" OR this is exactly their own plan
+          //  only allow if user is "Brilliant" to chose which plan they want
           const isAllowed = user.membership_plan === "Brilliant" || item.plan === user.membership_plan;
 
           return (

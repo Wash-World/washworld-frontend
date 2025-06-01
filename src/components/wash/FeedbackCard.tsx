@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from "@expo/vector-icons";
 import colors from "../../constants/colors";
 
-// Single feedback option
 interface FeedbackCard {
   title: string;
   description: string;
@@ -12,9 +11,7 @@ interface FeedbackCard {
   onPress: () => void;
 }
 
-// Main component that renders all options
 export const FeedbackCard: React.FC = () => {
-  // Hard-coded options array
   const options: FeedbackCard[] = [
     {
       title: "Great",
@@ -51,12 +48,7 @@ export const FeedbackCard: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {options.map((opt) => (
-        <TouchableOpacity
-          key={opt.title}
-          style={[styles.card, { borderColor: opt.color }]}
-          onPress={opt.onPress}
-          activeOpacity={0.8}
-        >
+        <TouchableOpacity key={opt.title} style={[styles.card, { borderColor: opt.color }]} onPress={opt.onPress} activeOpacity={0.8}>
           <View style={styles.headerRow}>
             <Text style={[styles.title, { color: opt.color }]}>{opt.title}</Text>
             <MaterialIcons name={opt.icon} size={24} color={opt.color} style={{ color: opt.color }} />

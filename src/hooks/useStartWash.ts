@@ -1,4 +1,3 @@
-// src/hooks/useStartWash.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "../store";

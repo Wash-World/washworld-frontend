@@ -12,15 +12,7 @@ type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.FEEDB
 export default function FeedbackDetailsScreen({ route, navigation }: Props) {
   const { feedbackId } = route.params;
   const [text, setText] = useState("");
-  const { mutateAsync: patchFeedback, isLoading } = usePatchFeedback();
-
-  if (isLoading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.greenBrand} />
-      </View>
-    );
-  }
+  const { mutateAsync: patchFeedback } = usePatchFeedback();
 
   const onSendFeedback = async () => {
     if (!text.trim()) {

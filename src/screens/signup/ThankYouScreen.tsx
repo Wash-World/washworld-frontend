@@ -4,16 +4,13 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 
-type ScreenProps = NativeStackScreenProps<
-  SignUpStackParamList,
-  typeof ROUTES.SIGNUP.THANK_YOU
->;
+type ScreenProps = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.THANK_YOU>;
 
 function ThankYouScreen({ navigation }: ScreenProps) {
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.replace(ROUTES.LOGIN); // 👈 use replace so user can't go back
-    }, 3000); // 3 seconds delay before redirect
+      navigation.replace(ROUTES.LOGIN);
+    }, 3000);
 
     return () => clearTimeout(timeout);
   }, [navigation]);
