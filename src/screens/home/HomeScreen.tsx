@@ -1,5 +1,3 @@
-// src/screens/home/HomeScreen.tsx
-
 import React, { useMemo } from "react";
 import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { useAppSelector } from "../../store";
@@ -15,26 +13,24 @@ const Card: React.FC<{ children: React.ReactNode; style?: any }> = ({ children, 
 export default function HomeScreen() {
   const user = useAppSelector((s) => s.auth.user);
 
-  // 1️⃣ Membership & price
+  //Membership & price
   const { data: plans = [], isLoading: plansLoading } = useMemberships();
   const currentPlan = useMemo(() => plans.find((p) => p.plan === user.membership_plan), [plans, user.membership_plan]);
   const planPrice = currentPlan ? `${currentPlan.price},- kr` : "DKK 0,-";
 
-  // 2️⃣ Locations lookup (for history)
+  //Locations lookup
   const { data: locations = [] } = useLocations();
   const nameById = useMemo(() => Object.fromEntries(locations.map((l) => [l.Location_id, l.name])) as Record<string, string>, [locations]);
 
-  // 3️⃣ Wash history (most recent 5)
+  // Wash history (most recent 5)
   const { data: history = [], isLoading: historyLoading, isError: historyError } = useWashHistory();
   const recent = history.slice(0, 5);
 
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        {/* Greeting */}
         <Text style={styles.greeting}>Hello, {user?.name || "Guest"}</Text>
 
-        {/* Your car */}
         <Text style={styles.sectionTitle}>Your car</Text>
         <Card>
           <View style={styles.cardHeader}>
@@ -45,7 +41,6 @@ export default function HomeScreen() {
           </Text>
         </Card>
 
-        {/* Your plan */}
         <Text style={styles.sectionTitle}>Your plan</Text>
         {plansLoading ? (
           <ActivityIndicator color={colors.greenBrand} />
@@ -61,7 +56,6 @@ export default function HomeScreen() {
           </Card>
         )}
 
-        {/* Favorites */}
         <Text style={styles.sectionTitle}>Your favourite locations</Text>
         {(user?.favorites || []).length === 0 ? (
           <Text style={styles.emptyText}>No favourites yet</Text>
@@ -74,7 +68,6 @@ export default function HomeScreen() {
           ))
         )}
 
-        {/* Recent washes */}
         <Text style={styles.sectionTitle}>Recent washes</Text>
         {historyLoading ? (
           <ActivityIndicator color={colors.greenBrand} />

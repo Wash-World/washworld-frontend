@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAppSelector } from "../store";
-import { fetchWashHistory } from "../services/api/washHistory";
-import type { WashHistoryResponseDto } from "../services/types/washHistory";
+import { fetchWashHistory } from "../services/api/washes";
+import type { WashHistoryResponseDto } from "../services/types/washes";
 
 export function useWashHistory() {
   //user & token from Redux
