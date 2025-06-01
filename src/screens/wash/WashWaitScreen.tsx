@@ -80,7 +80,6 @@ export default function WashWaitScreen({ navigation }: Props) {
     );
   }
 
-  // Render waiting UI
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.header}>
