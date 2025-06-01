@@ -105,8 +105,8 @@ export const validatePayment = (
     }
   }
 
-  if (!/^\d{3,4}$/.test(values.cvv)) {
-    errs.cvv = "3 or 4 digit code";
+  if (!/^\d{3}$/.test(values.cvv)) {
+    errs.cvv = "3 digit code";
   }
 
   return errs;
