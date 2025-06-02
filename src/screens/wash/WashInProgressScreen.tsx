@@ -1,5 +1,3 @@
-// src/screens/wash/WashInProgressScreen.tsx
-
 import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -12,10 +10,10 @@ import { useStartWash } from "../../hooks/useStartWash";
 type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.IN_PROGRESS>;
 
 export default function WashInProgressScreen({ route, navigation }: Props) {
-  // ① pull user + carplate from Redux
+  //pull user + carplate from Redux
   const user = useAppSelector((s) => s.auth.user);
-  // ② destructure the values passed in from SelectWashScreen
-  const { locationName, locationAddress, washPlan, durationWash } = route.params;
+  //destructure the values passed in from SelectWashScreen
+  const { locationName, locationAddress, durationWash } = route.params;
 
   // convert minutes → seconds
   const initialSeconds = durationWash * 60;
@@ -23,8 +21,8 @@ export default function WashInProgressScreen({ route, navigation }: Props) {
   const [started, setStarted] = useState(false);
   const intervalRef = useRef<NodeJS.Timer | null>(null);
 
-  // ③ our mutation hook
-  const { mutateAsync: startWash, isLoading: isStarting } = useStartWash();
+  //our mutation hook
+  const { mutateAsync: startWash } = useStartWash();
 
   const onStart = async () => {
     try {
@@ -44,7 +42,7 @@ export default function WashInProgressScreen({ route, navigation }: Props) {
 
       // after 10s, go to feedback
       setTimeout(() => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
+        if (intervalRef.current) clearInterval(intervalRef);
         navigation.replace(ROUTES.WASH.FEEDBACK, {
           washHistoryId: wash_history_id,
           locationId: route.params.locationId,
@@ -56,27 +54,9 @@ export default function WashInProgressScreen({ route, navigation }: Props) {
     }
   };
 
-  const onStop = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      Alert.alert("Emergency stop", "Wash stopped.");
-      setStarted(false);
-      setSecondsLeft(initialSeconds);
-    }
-  };
-
   // format mm:ss
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");
-
-  // while we're POSTing
-  if (isStarting) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.greenBrand} />
-      </View>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -98,10 +78,6 @@ export default function WashInProgressScreen({ route, navigation }: Props) {
           <Text style={styles.value}>#{route.params.locationId}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.label}>Wash</Text>
-          <Text style={styles.value}>{washPlan}</Text>
-        </View>
-        <View style={styles.row}>
           <Text style={styles.label}>Extra Services</Text>
           <Text style={styles.value}>None</Text>
         </View>
@@ -117,7 +93,7 @@ export default function WashInProgressScreen({ route, navigation }: Props) {
             <Text style={styles.startText}>START WASH</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity style={styles.stopButton} onPress={onStop} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.stopButton} activeOpacity={0.8}>
             <Text style={styles.stopText}>EMERGENCY STOP</Text>
           </TouchableOpacity>
         )}

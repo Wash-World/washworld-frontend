@@ -1,4 +1,3 @@
-// src/screens/signup/CardPaymentScreen.tsx
 import React, { useState } from "react";
 import { ScrollView, SafeAreaView, StyleSheet, View, Alert, ActivityIndicator } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -16,11 +15,13 @@ export default function CardPaymentScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((s) => s.signup);
 
-  // 1) Local form state + errors
-  const [owner, setOwner] = useState("");
-  const [number, setNumber] = useState("");
-  const [expiry, setExpiry] = useState("");
-  const [cvv, setCvv] = useState("");
+  // payment inputs
+  const [owner, setOwner] = useState<string>("");
+  const [number, setNumber] = useState<string>(""); // can include spaces
+  const [expiry, setExpiry] = useState<string>("");
+  const [cvv, setCvv] = useState<string>("");
+
+  //validation errors object
   const [errors, setErrors] = useState<{
     owner?: string;
     number?: string;
@@ -28,40 +29,113 @@ export default function CardPaymentScreen({ navigation }: Props) {
     cvv?: string;
   }>({});
 
-  // 2) Validation logic (unchanged)
-  const validate = (): boolean => {
-    const errs: typeof errors = {};
-    if (!owner.trim()) errs.owner = "Insert a valid name";
-    if (!/^\d{16}$/.test(number)) errs.number = "Use 16 digits";
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) errs.expiry = "Use MM/YY";
-    else {
-      const [mm, yy] = expiry.split("/").map((s) => parseInt(s, 10));
-      if (new Date(2000 + yy, mm) <= new Date()) errs.expiry = "Card expired";
+  //vallidation logic
+  const validateAll = (): boolean => {
+    const newErrors: typeof errors = {};
+
+    if (!/^[A-Za-z]+(?: [A-Za-z]+)+$/.test(owner.trim())) {
+      newErrors.owner = "Enter first and last name";
     }
-    if (!/^\d{3,4}$/.test(cvv)) errs.cvv = "3 or 4 digit code";
-    setErrors(errs);
-    return Object.keys(errs).length === 0;
+
+    const digitsOnly = number.replace(/\s+/g, "");
+    if (!/^\d{16}$/.test(digitsOnly)) {
+      newErrors.number = "Use 16 digits";
+    }
+
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+      newErrors.expiry = "Use format MM/YY";
+    } else {
+      const [mmStr, yyStr] = expiry.split("/");
+      const mm = parseInt(mmStr, 10);
+      const yy = parseInt(yyStr, 10);
+      // Create a Date for the last day of that month at 23:59:59
+      const expDate = new Date(2000 + yy, mm, 0, 23, 59, 59);
+      if (expDate < new Date()) {
+        newErrors.expiry = "Card expired";
+      }
+    }
+
+    if (!/^\d{3,4}$/.test(cvv.trim())) {
+      newErrors.cvv = "3 or 4 digit code";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  // 3) Handler that dispatches payment + submitSignup
-  const handlePay = async () => {
-    if (!validate()) return;
+  // onBlur handlers for each field
+  const onBlurOwner = () => {
+    if (!/^[A-Za-z]+(?: [A-Za-z]+)+$/.test(owner.trim())) {
+      setErrors((prev) => ({ ...prev, owner: "Enter first and last name" }));
+    } else {
+      setErrors((prev) => {
+        const { owner: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
 
-    // 3a) Save payment details
+  const onBlurNumber = () => {
+    const digitsOnly = number.replace(/\s+/g, "");
+    if (!/^\d{16}$/.test(digitsOnly)) {
+      setErrors((prev) => ({ ...prev, number: "Use 16 digits" }));
+    } else {
+      setErrors((prev) => {
+        const { number: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const onBlurExpiry = () => {
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+      setErrors((prev) => ({ ...prev, expiry: "Use format MM/YY" }));
+    } else {
+      const [mmStr, yyStr] = expiry.split("/");
+      const mm = parseInt(mmStr, 10);
+      const yy = parseInt(yyStr, 10);
+      const expDate = new Date(2000 + yy, mm, 0, 23, 59, 59);
+      if (expDate < new Date()) {
+        setErrors((prev) => ({ ...prev, expiry: "Card expired" }));
+      } else {
+        setErrors((prev) => {
+          const { expiry: _, ...rest } = prev;
+          return rest;
+        });
+      }
+    }
+  };
+
+  const onBlurCvv = () => {
+    if (!/^\d{3,4}$/.test(cvv.trim())) {
+      setErrors((prev) => ({ ...prev, cvv: "3 or 4 digit code" }));
+    } else {
+      setErrors((prev) => {
+        const { cvv: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const canProceed = owner.trim().length > 0 && number.replace(/\s+/g, "").length === 16 && /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry) && cvv.trim().length > 0;
+
+  const handlePay = async () => {
+    if (!validateAll()) {
+      return;
+    }
+
+    // dispatch payment info into Redux
     dispatch(
       setPayment({
-        card_owner: owner,
-        card_number: number,
+        card_owner: owner.trim(),
+        card_number: number.replace(/\s+/g, ""),
         expiry_date: expiry,
-        cvv,
+        cvv: cvv.trim(),
       })
     );
 
     try {
-      // 3b) Call the thunk and wait for it to complete
       await dispatch(submitSignup()).unwrap();
-
-      // 3c) On success, clear slice and go to ThankYou
       dispatch(resetSignup());
       navigation.navigate(ROUTES.SIGNUP.THANK_YOU);
     } catch (err: any) {
@@ -69,13 +143,57 @@ export default function CardPaymentScreen({ navigation }: Props) {
     }
   };
 
-  // allow button only if fields nonempty
-  const canProceed = owner.trim() !== "" && number.trim() !== "" && expiry.trim() !== "" && cvv.trim() !== "";
-
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
-      <ScrollView contentContainerStyle={styles.container}>
-        <Payment owner={owner} onChangeOwner={setOwner} number={number} onChangeNumber={(t) => setNumber(t.replace(/\D/g, ""))} expiry={expiry} onChangeExpiry={setExpiry} cvv={cvv} onChangeCvv={setCvv} errors={errors} />
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Payment
+          owner={owner}
+          onChangeOwner={(text) => {
+            setOwner(text);
+            if (errors.owner) {
+              setErrors((prev) => {
+                const { owner: _o, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurOwner={onBlurOwner}
+          number={number}
+          onChangeNumber={(text) => {
+            // Allow spaces or digits; we only strip spaces in validation
+            setNumber(text);
+            if (errors.number) {
+              setErrors((prev) => {
+                const { number: _n, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurNumber={onBlurNumber}
+          expiry={expiry}
+          onChangeExpiry={(text) => {
+            setExpiry(text);
+            if (errors.expiry) {
+              setErrors((prev) => {
+                const { expiry: _e, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurExpiry={onBlurExpiry}
+          cvv={cvv}
+          onChangeCvv={(text) => {
+            setCvv(text);
+            if (errors.cvv) {
+              setErrors((prev) => {
+                const { cvv: _c, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurCvv={onBlurCvv}
+          errors={errors}
+        />
 
         {status === "pending" && <ActivityIndicator size="large" color={colors.greenBrand} style={{ marginVertical: 16 }} />}
 

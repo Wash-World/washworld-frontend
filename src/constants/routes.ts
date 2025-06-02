@@ -1,13 +1,13 @@
 export const ROUTES = {
-  // 🌊 Root
+  // Root
   SPLASH: "Splash",
 
-  // 🔐 Auth Stack
+  // Auth Stack
   AUTH_STACK: "AuthStack",
   LOGIN: "Login",
   FORGOT_PASSWORD: "ForgotPassword",
 
-  // 🧾 Registration Stack
+  // Registration Stack
   SIGNUP: {
     STACK: "SignUpNavigator", // <-- this names the navigator
     SELECT_PLAN: "SelectPlan",
@@ -16,14 +16,14 @@ export const ROUTES = {
     THANK_YOU: "OnboardingThankYou",
   },
 
-  // 🧭 App Tabs
+  // App Tabs
   APP_TABS: "AppTabs",
   HOME: "Home",
   PROFILE: "Profile",
   LOCATION: "Location",
   HELP: "Help",
 
-  // 🧼 Wash Stack
+  // Wash Stack
   WASH: {
     STACK: "WashStack",
     WAIT: "WashWait",
@@ -33,4 +33,4 @@ export const ROUTES = {
     FEEDBACK_DETAILS: "FeedbackDetails",
     THANK_YOU: "WashThankYou",
   },
-};
+} as const;

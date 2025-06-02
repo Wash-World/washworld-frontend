@@ -2,11 +2,10 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import ServiceChip from "../elements/ServiceChip";
 
-// Master list of all services (static)
+// list of all the services
 const ALL_SERVICES = ["Shampoo", "Tørring", "Børstevask", "Højtryksskyl", "Hjulvask", "Skyllevoks", "Undervognsskyl", "Polering", "Insektrens", "Affedtning", "Foam Splash", "Ekstra tørring"];
 
 interface AllServiceChipsProps {
-  /** Subset of services which should be rendered active */
   activeServices: string[];
 }
 
@@ -30,12 +29,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginHorizontal: -4, // offsets item padding for even gutters
+    marginHorizontal: -4,
   },
   item: {
-    width: "33.3333%", // three columns
-    paddingHorizontal: 4, // gutter on each side
-    marginBottom: 8, // space between rows
+    width: "33.3333%",
+    paddingHorizontal: 4,
+    marginBottom: 8,
   },
 });
 

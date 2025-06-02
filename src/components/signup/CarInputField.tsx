@@ -1,5 +1,3 @@
-// src/components/signup/CarInputField.tsx
-
 import React from "react";
 import { View, Text, TextInput, StyleSheet, Image, TextInputProps } from "react-native";
 import colors from "../../constants/colors";
@@ -30,7 +28,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: "row",
     alignItems: "center",
-    height: 48, // fixed height
+    height: 48,
     borderRadius: 8,
     overflow: "hidden",
     borderWidth: 1,
@@ -42,12 +40,12 @@ const styles = StyleSheet.create({
     borderColor: colors.error,
   },
   flag: {
-    width: 48, // matches height for full-fill
+    width: 48,
     height: 48,
   },
   input: {
     flex: 1,
-    paddingHorizontal: 12, // horizontal padding
+    paddingHorizontal: 12,
     textAlignVertical: "center",
     color: colors.gray80,
     fontSize: 16,

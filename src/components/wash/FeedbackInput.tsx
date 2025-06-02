@@ -1,14 +1,10 @@
-// src/components/wash/FeedbackInput.tsx
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import colors from "../../constants/colors";
 
 export interface FeedbackInputProps {
-  /** The current text of the feedback */
   text: string;
-  /** Called when user edits the feedback text */
   onChangeText: (newText: string) => void;
-  /** Called when user taps “Send Feedback” */
   onSendFeedback: () => void;
 }
 

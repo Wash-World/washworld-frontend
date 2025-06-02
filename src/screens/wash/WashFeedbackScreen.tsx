@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<WashStackParamList, typeof ROUTES.WASH.FEEDB
 
 export default function WashFeedbackScreen({ route, navigation }: Props) {
   const { washHistoryId } = route.params;
-  const { mutateAsync: postFeedback, isLoading } = usePostFeedback();
+  const { mutateAsync: postFeedback } = usePostFeedback();
 
   const options = [
     {
@@ -43,17 +43,10 @@ export default function WashFeedbackScreen({ route, navigation }: Props) {
     },
   ];
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={colors.greenBrand} />
-      </SafeAreaView>
-    );
-  }
-
   const onSelect = async (rating: number, comment: string, nextRoute: typeof ROUTES.WASH.THANK_YOU | typeof ROUTES.WASH.FEEDBACK_DETAILS) => {
     try {
       const { feedback_id } = await postFeedback({
+        //here i call the mutation function of tanstack
         wash_history_id: washHistoryId,
         rating,
         comment,
