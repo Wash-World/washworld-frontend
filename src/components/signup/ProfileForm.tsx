@@ -51,7 +51,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ firstName, lastName, phone, e
       </View>
     </View>
 
-    <InputField label="Mobile Number" placeholder="12345678" keyboardType="phone-pad" value={phone} onChangeText={onChangePhone} onBlur={onBlurPhone} error={errors.phone} />
+    <InputField label="Mobile Number" placeholder="123456" keyboardType="phone-pad" value={phone} onChangeText={onChangePhone} onBlur={onBlurPhone} error={errors.phone} />
 
     <InputField label="Email" placeholder="johndoe@email.com" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={onChangeEmail} onBlur={onBlurEmail} error={errors.email} />
 

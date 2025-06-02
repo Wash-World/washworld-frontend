@@ -83,7 +83,14 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
   };
 
   // Enable “Next” only if all fields are syntactically valid
-  const canProceed = /^[A-Z]{2}\s\d{5}$/.test(plate.trim()) && firstName.trim().length > 0 && lastName.trim().length > 0 && /^\d{8}$/.test(phone) && /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email) && password.length >= 6 && confirm === password;
+  const canProceed =
+    /^[A-Z]{2}\s\d{5}$/.test(plate.trim()) &&
+    firstName.trim().length > 0 &&
+    lastName.trim().length > 0 &&
+    /^\d{6}$/.test(phone) && // changed from \d{8} to \d{6}
+    /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email) &&
+    password.length >= 6 &&
+    confirm === password;
 
   // On pressing Next: re-validate plate + profile, then navigate
   const handleNext = () => {
@@ -185,8 +192,8 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
             }
           }}
           onBlurPhone={() => {
-            if (!/^\d{8}$/.test(phone)) {
-              setErrors((prev) => ({ ...prev, phone: "Use 8 digits (no country code)" }));
+            if (!/^\d{6}$/.test(phone)) {
+              setErrors((prev) => ({ ...prev, phone: "Use 6 digits (no country code)" }));
             } else {
               setErrors((prev) => {
                 const { phone: _, ...rest } = prev;
