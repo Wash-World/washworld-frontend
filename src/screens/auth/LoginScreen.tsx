@@ -70,7 +70,7 @@ export default function LoginScreen({ navigation }: Props) {
             <ActivityIndicator size="large" color={colors.greenBrand} style={styles.signInButton} />
           ) : (
             <TouchableOpacity style={styles.signInButton} onPress={handleLogin} disabled={!email || !password}>
-              <Text style={styles.signInButtonText}>Sign In</Text>
+              <Text style={styles.signInButtonText}>Log In</Text>
             </TouchableOpacity>
           )}
 
@@ -96,7 +96,7 @@ export default function LoginScreen({ navigation }: Props) {
                 })
               }
             >
-              <Text style={styles.signupLink}>Sign up</Text>
+              <Text style={styles.signupLink}>Register</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
