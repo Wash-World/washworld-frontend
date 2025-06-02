@@ -1,145 +1,267 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Button, Alert } from "react-native";
+import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 import CarInputField from "../../components/signup/CarInputField";
-import ProfileForm, { ProfileFormProps } from "../../components/signup/ProfileForm";
+import ProfileForm from "../../components/signup/ProfileForm";
 import colors from "../../constants/colors";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { useAppDispatch } from "../../store";
-import { setProfile } from "../../store/signupSlice";
+import Button from "../../components/elements/Button";
+import { Ionicons } from "@expo/vector-icons";
 
 type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.INSERT_INFO>;
 
-export default function InsertInfoScreen({ navigation }: Props) {
-  const dispatch = useAppDispatch();
-  // Plate state + validation
-  const [plate, setPlate] = useState("");
+export default function InsertInfoScreen({ navigation, route }: Props) {
+  const { membership_id, assigned_location_api_id, all_locations } = route.params;
+
+  // Car plate state
+  const [plate, setPlate] = useState<string>("");
   const [plateError, setPlateError] = useState<string | undefined>(undefined);
 
+  // Profile fields state
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirm, setConfirm] = useState<string>("");
+
+  // Toggle show/hide password
+  const [showPwd, setShowPwd] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+
+  // Validation errors object
+  const [errors, setErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    email?: string;
+    password?: string;
+    confirm?: string;
+  }>({});
+
+  // Car-plate validation: exactly two uppercase letters, space, five digits
   const validatePlate = (): boolean => {
-    if (!plate.trim()) {
-      setPlateError("Plate number cannot be empty");
+    const plateRegex = /^[A-Z]{2}\s\d{5}$/;
+    if (!plateRegex.test(plate.trim())) {
+      setPlateError("Car plate must be in format: DH 12345");
       return false;
     }
     setPlateError(undefined);
     return true;
   };
 
-  // Profile state + validation
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [showPwd, setShowPwd] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [errors, setErrors] = useState<ProfileFormProps["errors"]>({});
-
+  // Profile validation: first/last nonempty, phone 6 digits, email format, password ≥6, confirm matches
   const validateProfile = (): boolean => {
-    const errs: ProfileFormProps["errors"] = {};
-    if (!firstName.trim()) errs.firstName = "Insert a name";
-    if (!lastName.trim()) errs.lastName = "Insert a last name";
-    if (!/^\+\d{2}\s?\d{6,}$/.test(phone)) errs.phone = "Insert a valid phone number";
-    if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email)) errs.email = "Email not valid";
-    if (password.length < 4) errs.password = "Password too short. Choose at least 6 characters.";
-    if (confirm !== password) errs.confirm = "Passwords don’t match";
+    const errs: typeof errors = {};
+
+    if (!firstName.trim()) {
+      errs.firstName = "Insert a name";
+    }
+    if (!lastName.trim()) {
+      errs.lastName = "Insert a last name";
+    }
+
+    if (!/^\d{6}$/.test(phone)) {
+      errs.phone = "Use 6 digits (no country code)";
+    }
+
+    if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email)) {
+      errs.email = "Email not valid";
+    }
+
+    if (password.length < 6) {
+      errs.password = "Password too short (min 6 chars)";
+    }
+
+    if (confirm !== password) {
+      errs.confirm = "Passwords don’t match";
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
 
-  // Icons for password fields
-  const passwordIcon = <Ionicons name={showPwd ? "eye" : "eye-off"} size={20} color={colors.gray40} />;
-  const confirmIcon = <Ionicons name={showConfirm ? "eye" : "eye-off"} size={20} color={colors.gray40} />;
+  // Enable “Next” only if all fields are syntactically valid
+  const canProceed = /^[A-Z]{2}\s\d{5}$/.test(plate.trim()) && firstName.trim().length > 0 && lastName.trim().length > 0 && /^\d{8}$/.test(phone) && /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email) && password.length >= 6 && confirm === password;
 
+  // On pressing Next: re-validate plate + profile, then navigate
   const handleNext = () => {
-    const okPlate = validatePlate();
-    const okProfile = validateProfile();
-    if (!okPlate || !okProfile) return;
+    const plateOk = validatePlate();
+    const profileOk = validateProfile();
+    if (!plateOk || !profileOk) {
+      return;
+    }
 
-    dispatch(
-      setProfile({
-        name: firstName,
-        lastname: lastName,
-        email,
-        password,
-        mobile_num: phone,
-        carplate: plate,
-      })
-    );
-    navigation.navigate(ROUTES.SIGNUP.PAYMENT);
+    navigation.navigate(ROUTES.SIGNUP.PAYMENT, {
+      membership_id,
+      assigned_location_api_id,
+      all_locations,
+      name: firstName.trim(),
+      lastname: lastName.trim(),
+      email: email.trim(),
+      password,
+      mobile_num: phone,
+      carplate: plate.trim(),
+    });
   };
 
-  // Control button enabled state
-  const canProceed = plate.trim().length > 0 && firstName.trim().length > 0 && lastName.trim().length > 0 && /^\+\d{2}\s?\d{6,}$/.test(phone) && /^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email) && password.length >= 6 && confirm === password;
-
-  function onNext(): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Insert your info</Text>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.select({ ios: "padding", android: undefined })}>
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>Insert your info</Text>
 
-      <CarInputField
-        placeholder="Car plate number"
-        value={plate}
-        onChangeText={(t) => {
-          setPlate(t);
-          if (plateError) setPlateError(undefined);
-        }}
-        error={plateError}
-      />
-
-      <ProfileForm
-        firstName={firstName}
-        lastName={lastName}
-        phone={phone}
-        email={email}
-        password={password}
-        confirm={confirm}
-        showPwd={showPwd}
-        showConfirm={showConfirm}
-        errors={errors}
-        onChangeFirstName={setFirstName}
-        onChangeLastName={setLastName}
-        onChangePhone={setPhone}
-        onChangeEmail={setEmail}
-        onChangePassword={setPassword}
-        onChangeConfirm={setConfirm}
-        onToggleShowPwd={() => setShowPwd((v) => !v)}
-        onToggleShowConfirm={() => setShowConfirm((v) => !v)}
-        passwordIcon={passwordIcon}
-        confirmIcon={confirmIcon}
-        onNext={function (): void {
-          throw new Error("Function not implemented.");
-        }}
-      />
-
-      <View style={styles.buttonWrapper}>
-        <Button
-          title="Next"
-          // always call handleNext, without disabled or validation guard
-          onPress={() => {
-            // skip validation for now:
-            dispatch(
-              setProfile({
-                name: firstName,
-                lastname: lastName,
-                email,
-                password,
-                mobile_num: phone,
-                carplate: plate,
-              })
-            );
-            navigation.navigate(ROUTES.SIGNUP.PAYMENT);
+        <CarInputField
+          placeholder="Car plate (e.g. DH 12345)"
+          value={plate}
+          onChangeText={(t) => {
+            const upper = t.toUpperCase();
+            setPlate(upper);
+            if (plateError) {
+              setPlateError(undefined);
+            }
           }}
-          disabled={false}
+          onBlur={() => {
+            validatePlate();
+          }}
+          error={plateError}
         />
-      </View>
-    </ScrollView>
+
+        <ProfileForm
+          firstName={firstName}
+          lastName={lastName}
+          phone={phone}
+          email={email}
+          password={password}
+          confirm={confirm}
+          showPwd={showPwd}
+          showConfirm={showConfirm}
+          errors={errors}
+          onChangeFirstName={(t) => {
+            setFirstName(t);
+            if (errors.firstName) {
+              setErrors((prev) => {
+                const { firstName: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurFirstName={() => {
+            if (!firstName.trim()) {
+              setErrors((prev) => ({ ...prev, firstName: "Insert a name" }));
+            } else {
+              setErrors((prev) => {
+                const { firstName: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onChangeLastName={(t) => {
+            setLastName(t);
+            if (errors.lastName) {
+              setErrors((prev) => {
+                const { lastName: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurLastName={() => {
+            if (!lastName.trim()) {
+              setErrors((prev) => ({ ...prev, lastName: "Insert a last name" }));
+            } else {
+              setErrors((prev) => {
+                const { lastName: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onChangePhone={(t) => {
+            setPhone(t);
+            if (errors.phone) {
+              setErrors((prev) => {
+                const { phone: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurPhone={() => {
+            if (!/^\d{8}$/.test(phone)) {
+              setErrors((prev) => ({ ...prev, phone: "Use 8 digits (no country code)" }));
+            } else {
+              setErrors((prev) => {
+                const { phone: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onChangeEmail={(t) => {
+            setEmail(t);
+            if (errors.email) {
+              setErrors((prev) => {
+                const { email: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurEmail={() => {
+            if (!/^[\w-.]+@[\w-]+\.[a-z]{2,}$/i.test(email)) {
+              setErrors((prev) => ({ ...prev, email: "Email not valid" }));
+            } else {
+              setErrors((prev) => {
+                const { email: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onChangePassword={(t) => {
+            setPassword(t);
+            if (errors.password) {
+              setErrors((prev) => {
+                const { password: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurPassword={() => {
+            if (password.length < 6) {
+              setErrors((prev) => ({ ...prev, password: "Password too short (min 6 chars)" }));
+            } else {
+              setErrors((prev) => {
+                const { password: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onChangeConfirm={(t) => {
+            setConfirm(t);
+            if (errors.confirm) {
+              setErrors((prev) => {
+                const { confirm: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onBlurConfirm={() => {
+            if (confirm !== password) {
+              setErrors((prev) => ({ ...prev, confirm: "Passwords don’t match" }));
+            } else {
+              setErrors((prev) => {
+                const { confirm: _, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+          onToggleShowPwd={() => setShowPwd((v) => !v)}
+          onToggleShowConfirm={() => setShowConfirm((v) => !v)}
+          passwordIcon={<Ionicons name={showPwd ? "eye" : "eye-off"} size={20} color={colors.gray40} />}
+          confirmIcon={<Ionicons name={showConfirm ? "eye" : "eye-off"} size={20} color={colors.gray40} />}
+        />
+
+        <View style={styles.buttonWrapper}>
+          <Button title="Next" onPress={handleNext} disabled={!canProceed} />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
