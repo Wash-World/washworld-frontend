@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Select from "../../components/elements/Select";
-import LocationMap from "../../components/Location /LocationMap";
+import LocationMap from "../../components/Location/LocationMap";
 import { useLocations } from "../../hooks/useLocations";
 import { useAppSelector } from "../../store";
 import { addFavouriteLocation } from "../../services/api/addFavouriteLocation";
