@@ -1,4 +1,5 @@
-import { Location } from "../types/location"; // adjust path as needed
+import { Location } from "../types/location";
+
 
 export async function fetchLocations(): Promise<Location[]> {
   try {
@@ -17,5 +18,6 @@ export async function fetchLocations(): Promise<Location[]> {
     throw error;
   }
 }
+
 
 
