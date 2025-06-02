@@ -16,7 +16,7 @@ module.exports = {
       '|expo-constants' +
       '|expo-asset' +
       '|expo-file-system' +
-      // Add these two so their ES imports get compiled, too:
+      '|@expo/vector-icons' +
       '|react-redux' +
       '|redux-mock-store' +
       ')',
