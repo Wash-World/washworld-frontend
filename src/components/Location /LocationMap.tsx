@@ -2,19 +2,14 @@ import React, { useEffect, useRef } from "react";
 import { StyleSheet, Text } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import { Location } from "../../services/types/location";
-import { TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { View } from "react-native";
 import colors from "../../constants/colors";
 
-type LocationPayload = {
-  location_id: string;
-};
-
 type MapProps = {
   locations: Location[];
   selectedLocation?: Location | null;
-  setSelectedLocation?: (payload: LocationPayload) => void;
+  setSelectedLocation?: (location_id: string) => void;
 };
 
 const Map: React.FC<MapProps> = ({ locations, selectedLocation, setSelectedLocation }) => {
@@ -62,8 +57,7 @@ const Map: React.FC<MapProps> = ({ locations, selectedLocation, setSelectedLocat
           <Marker
             onPress={() => {
               console.log("Marker pressed", loc.name);
-                  setSelectedLocation?.({ location_id: loc.Location_id }); // <-- this line
-
+              setSelectedLocation?.(loc.Location_id); // This will update the selectedLocationId state in the parent component
             }}
             key={loc.uid}
             coordinate={{ latitude, longitude }}
@@ -71,11 +65,18 @@ const Map: React.FC<MapProps> = ({ locations, selectedLocation, setSelectedLocat
             description={loc.address}
           >
             <Callout>
-              <View>
-                <Text>{loc.name}</Text>
-                <Text>{loc.address}</Text>
-                <Text>{loc.open_hours}</Text>
-                <Text style={{ marginTop: 8, color: colors.greenBrand }}>Add to Favourites</Text>
+              <View style={styles.calloutContainer}>
+                <Text style={styles.calloutTitle}>{loc.name}</Text>
+                <Text style={styles.calloutAddress}>{loc.address}</Text>
+                <Text style={styles.calloutHours}>
+                  <Text style={styles.calloutHoursLabel}>Opening hours: </Text>
+                  {loc.open_hours}
+                </Text>
+
+                <View style={styles.calloutActionContainer}>
+                  <FontAwesome name="heart" size={14} color={colors.greenBrand} />
+                  <Text style={styles.calloutAction}>Add to Favourites</Text>
+                </View>
               </View>
             </Callout>
           </Marker>
@@ -99,6 +100,52 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     color: "red",
     fontWeight: "bold",
+  },
+  calloutContainer: {
+    backgroundColor: colors.white,
+    padding: 12,
+    borderRadius: 10,
+    minWidth: 220,
+    elevation: 4, // Android shadow
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.gray80,
+    marginBottom: 4,
+  },
+
+  calloutAddress: {
+    fontSize: 14,
+    color: colors.gray60,
+    marginBottom: 2,
+  },
+
+  calloutHours: {
+    fontSize: 13,
+    color: colors.gray40,
+    marginBottom: 8,
+  },
+
+  calloutActionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  calloutAction: {
+    marginLeft: 6,
+    color: colors.greenBrand,
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  calloutHoursLabel: {
+    fontWeight: "600",
+    color: colors.gray60,
   },
 });
 
