@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, ScrollView, StyleSheet, KeyboardAvoidingView, Platform, SafeAreaView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useAppDispatch } from "../../store";
+import { setProfile } from "../../store/signupSlice";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 import CarInputField from "../../components/signup/CarInputField";
@@ -12,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.INSERT_INFO>;
 
 export default function InsertInfoScreen({ navigation, route }: Props) {
+  const dispatch = useAppDispatch();
   const { membership_id, assigned_location_api_id, all_locations } = route.params;
 
   // Car plate state
@@ -92,7 +95,7 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
     password.length >= 6 &&
     confirm === password;
 
-  // On pressing Next: re-validate plate + profile, then navigate
+  // On pressing Next: re-validate plate + profile, dispatch to Redux, then navigate
   const handleNext = () => {
     const plateOk = validatePlate();
     const profileOk = validateProfile();
@@ -100,21 +103,23 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
       return;
     }
 
-    navigation.navigate(ROUTES.SIGNUP.PAYMENT, {
-      membership_id,
-      assigned_location_api_id,
-      all_locations,
-      name: firstName.trim(),
-      lastname: lastName.trim(),
-      email: email.trim(),
-      password,
-      mobile_num: phone,
-      carplate: plate.trim(),
-    });
+    // Dispatch profile data into Redux (use "name" for firstName to match backend)
+    dispatch(
+      setProfile({
+        name: firstName.trim(),
+        lastname: lastName.trim(),
+        email: email.trim(),
+        password,
+        mobile_num: phone,
+        carplate: plate.trim(),
+      })
+    );
+
+    navigation.navigate(ROUTES.SIGNUP.PAYMENT);
   };
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.select({ ios: "padding", android: undefined })}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <Text style={styles.title}>Insert your info</Text>
 
@@ -268,7 +273,7 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
           <Button title="Next" onPress={handleNext} disabled={!canProceed} />
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 

@@ -15,17 +15,7 @@ export type SignUpStackParamList = {
     all_locations?: boolean;
   };
 
-  [ROUTES.SIGNUP.PAYMENT]: {
-    name: string;
-    lastname: string;
-    email: string;
-    password: string;
-    mobile_num: string;
-    carplate?: string;
-    membership_id: number;
-    assigned_location_api_id?: string;
-    all_locations?: boolean;
-  };
+  [ROUTES.SIGNUP.PAYMENT]: undefined;
 
   [ROUTES.SIGNUP.THANK_YOU]: undefined;
 };

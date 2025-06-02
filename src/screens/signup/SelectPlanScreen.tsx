@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import React, { useEffect, useState } from "react";
-import { View, ScrollView, StyleSheet, ActivityIndicator, Text } from "react-native";
+import { View, ScrollView, StyleSheet, ActivityIndicator, Text, SafeAreaView } from "react-native";
 import { SignUpStackParamList } from "../../navigation/SignUpNavigator";
 import { ROUTES } from "../../constants/routes";
 import MembershipCard from "../../components/elements/MemberchipCard";
@@ -11,6 +11,8 @@ import Checkbox from "../../components/elements/Checkbox";
 import Button from "../../components/elements/Button";
 import { useMemberships } from "../../hooks/useMemberships";
 import { useLocations } from "../../hooks/useLocations";
+import { useAppDispatch } from "../../store";
+import { setPlan } from "../../store/signupSlice";
 
 type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.SELECT_PLAN>;
 
@@ -20,6 +22,8 @@ export interface LocationOption {
 }
 
 export default function SelectPlanScreen({ navigation }: Props) {
+  const dispatch = useAppDispatch();
+
   const { data: memberships = [], isLoading: memLoading, isError: memError } = useMemberships();
   const { data: locations = [], isLoading: locLoading } = useLocations();
 
@@ -70,7 +74,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
   const canProceed = agreeAll || Boolean(selectedLocation);
 
   return (
-    <ScrollView>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.white }}>
       <View style={styles.container}>
         <Text style={styles.title}>Which plan suits you?</Text>
 
@@ -104,6 +108,14 @@ export default function SelectPlanScreen({ navigation }: Props) {
             title="Next"
             disabled={!canProceed}
             onPress={() => {
+              // Dispatch selected plan + location into Redux
+              dispatch(
+                setPlan({
+                  membership_id: activeId!,
+                  assigned_location_api_id: agreeAll ? undefined : selectedLocation!,
+                  all_locations: agreeAll,
+                })
+              );
               navigation.navigate(ROUTES.SIGNUP.INSERT_INFO, {
                 membership_id: activeId!,
                 assigned_location_api_id: agreeAll ? undefined : selectedLocation!,
@@ -113,7 +125,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
           />
         </View>
       </View>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
