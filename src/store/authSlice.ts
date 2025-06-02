@@ -23,63 +23,65 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
-  async (dto: LoginDTO, { rejectWithValue }) => {
-    try {
-      const res = await fetch(`http://${LAN_IP}:3000/auth/login`, {
-        //Makes API call
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dto),
-      });
+export const loginUser = createAsyncThunk("auth/loginUser", async (dto: LoginDTO, { rejectWithValue }) => {
+  try {
+    const res = await fetch(`http://${LAN_IP}:3000/auth/login`, {
+      //Makes API call
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto),
+    });
 
-      if (!res.ok) {
-        const err = await res.json();
-        return rejectWithValue(err.message || "Failed to login");
-      }
-
-      const data = await res.json(); // { user, access_token }
-      // console.log("Slice - Login response:", data);
-
-      await SecureStore.setItemAsync("token", data.access_token); // Save token in SecureStore
-      console.log("Token saved to SecureStore:", data.access_token);
-
-      return data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Something went wrong");
+    if (!res.ok) {
+      const err = await res.json();
+      return rejectWithValue(err.message || "Failed to login");
     }
-  }
-);
 
-export const fetchCurrentUser = createAsyncThunk(
-  "auth/fetchCurrentUser",
-  async (token: string, { rejectWithValue }) => {
-    try {
-      const res = await fetch(`${LAN_IP}/users/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) {
-        return rejectWithValue("Failed to fetch user");
-      }
-      const user = await res.json();
-      return user;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch user");
-    }
+    const data = await res.json(); // { user, access_token }
+    //console.log("Slice - Login response:", data);
+
+    await SecureStore.setItemAsync("token", data.access_token); // Save token in SecureStore
+    // console.log("Token saved to SecureStore:", data.access_token);
+
+    return data;
+  } catch (error: any) {
+    return rejectWithValue(error.message || "Something went wrong");
   }
-);
+});
+
+export const fetchCurrentUser = createAsyncThunk("auth/fetchCurrentUser", async (token: string, { rejectWithValue, dispatch }) => {
+  try {
+    const res = await fetch(`${LAN_IP}/users/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (res.status === 401) {
+      // token expired or invalid
+      dispatch(clearAuth()); // clear Redux user+token
+      await SecureStore.deleteItemAsync("token");
+      return rejectWithValue("Token expired");
+    }
+    if (!res.ok) {
+      return rejectWithValue("Failed to fetch user");
+    }
+    const user = await res.json();
+    return user;
+  } catch (err: any) {
+    return rejectWithValue(err.message || "Failed to fetch user");
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
     setToken(state, action: PayloadAction<string>) {
-      //simple action that updates state.token in the Redux store
       state.token = action.payload;
     },
-    setUser(state, action: PayloadAction<any>) {
-      state.user = action.payload;
+    clearAuth(state) {
+      state.token = null;
+      state.user = null;
+      state.status = "idle";
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -107,5 +109,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { setToken, setUser } = authSlice.actions;
+export const { setToken, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

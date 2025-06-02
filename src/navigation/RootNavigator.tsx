@@ -6,8 +6,8 @@ import AuthNavigator from "./AuthNavigator";
 import AppTabsNavigator from "./AppTabsNavigator";
 import { ROUTES } from "../constants/routes";
 import { useAppDispatch, useAppSelector } from "../store";
-import { getToken } from "../hooks/secureStore";
-import { setToken } from "../store/authSlice";
+import { deleteToken, getToken } from "../hooks/secureStore";
+import { clearAuth, setToken } from "../store/authSlice";
 import { fetchCurrentUser } from "../store/authSlice";
 
 const Stack = createNativeStackNavigator();
@@ -25,36 +25,36 @@ const RootNavigator = () => {
     const restoreAuth = async () => {
       try {
         const savedToken = await getToken();
-        console.log(
-          "RestoreAuth - Token restored from SecureStore:",
-          savedToken
-        );
-        if (savedToken) {
-          dispatch(setToken(savedToken));
-          // fetch user profile if needed...
-        } else {
-          console.log("No token found");
+        if (!savedToken) {
+          // No token in SecureStore → skip fetch
+          setIsLoading(false);
+          return;
+        }
+
+        // Put the token into Redux first:
+        dispatch(setToken(savedToken));
+
+        // WAIT for fetchCurrentUser to complete:
+        const resultAction = await dispatch(fetchCurrentUser(savedToken));
+
+        if (fetchCurrentUser.rejected.match(resultAction)) {
+          // fetchCurrentUser failed (likely token expired or invalid)
+          dispatch(clearAuth());
+          await deleteToken(); // Remove invalid token from SecureStore
         }
       } catch (error) {
         console.error("Error restoring token:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     restoreAuth();
-  }, []);
+  }, [dispatch]);
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isLoading ? (
-          <Stack.Screen name={ROUTES.SPLASH} component={SplashScreen} />
-        ) : !isAuthenticated ? (
-          <Stack.Screen name={ROUTES.AUTH_STACK} component={AuthNavigator} />
-        ) : (
-          <Stack.Screen name={ROUTES.APP_TABS} component={AppTabsNavigator} />
-        )}
-      </Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>{isLoading ? <Stack.Screen name={ROUTES.SPLASH} component={SplashScreen} /> : !isAuthenticated ? <Stack.Screen name={ROUTES.AUTH_STACK} component={AuthNavigator} /> : <Stack.Screen name={ROUTES.APP_TABS} component={AppTabsNavigator} />}</Stack.Navigator>
     </NavigationContainer>
   );
 };

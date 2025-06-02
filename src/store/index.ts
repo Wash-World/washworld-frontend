@@ -1,6 +1,3 @@
-// # createStore, applyMiddleware, rootReducer
-// store/index.ts
-
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
 import signupReducer from "./signupSlice";
