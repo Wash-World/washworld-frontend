@@ -3,7 +3,6 @@ import { SafeAreaView, ScrollView, View, Text, StyleSheet, TouchableOpacity, Act
 import { useAppSelector } from "../../store";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../../constants/colors";
-
 import { useMemberships } from "../../hooks/useMemberships";
 import { useLocations } from "../../hooks/useLocations";
 import { useWashHistory } from "../../hooks/useWashHistory";

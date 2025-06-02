@@ -1,7 +1,10 @@
 export interface MembershipResponseDto {
-  id: number;
+  membership_id: number;
   plan: string;
   price: number;
   duration_wash: number;
-  serviceIds?: number[];
+  services: {
+    service_id: number;
+    name: string;
+  }[];
 }
