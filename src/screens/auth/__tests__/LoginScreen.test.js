@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { render, fireEvent } from '@testing-library/react-native'
-import LoginScreen from '../src/screens/auth/LoginScreen'
-import { ROUTES } from '../src/constants/routes'
+import LoginScreen from '../LoginScreen'
+import { ROUTES } from '../../../constants/routes'
 
 // 1. Shared, mutable mockAuthState for our selector to use
 let mockAuthState = {
@@ -101,7 +101,7 @@ describe('LoginScreen UI states', () => {
       token: 'xyz',
       user: { id: 5 },
     }
-    const { saveToken } = require('../src/hooks/secureStore')
+    const { saveToken } = require('../../../hooks/secureStore')
 
     // ACT
     render(<LoginScreen navigation={navigation} />)
