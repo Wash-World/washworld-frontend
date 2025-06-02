@@ -2,10 +2,6 @@ import React from "react";
 import { render, fireEvent } from "@testing-library/react-native";
 import ProfileForm from "../ProfileForm";
 
-// We are mimicking a real-world situation
-// where a form is submitted without required fields filled out,
-// and we expect to show validation errors.
-
 describe("ProfileForm", () => {
   const mockProps = {
     firstName: "John",
@@ -18,10 +14,6 @@ describe("ProfileForm", () => {
     showConfirm: false,
     errors: {},
 
-    // These are fake event handlers. In the real app, when a user types in a form field,
-    // the component calls a function like onChangeFirstName to update the form state.
-    // In the test, we just want to make sure those functions exist so the component
-    // doesn’t crash when trying to call them.
     onChangeFirstName: jest.fn(),
     onChangeLastName: jest.fn(),
     onChangePhone: jest.fn(),
@@ -30,25 +22,33 @@ describe("ProfileForm", () => {
     onChangeConfirm: jest.fn(),
     onToggleShowPwd: jest.fn(),
     onToggleShowConfirm: jest.fn(),
-    onNext: jest.fn(),
+    onBlurFirstName: jest.fn(),
+    onBlurLastName: jest.fn(),
+    onBlurPhone: jest.fn(),
+    onBlurEmail: jest.fn(),
+    onBlurPassword: jest.fn(),
+    onBlurConfirm: jest.fn(),
     passwordIcon: null,
     confirmIcon: null,
   };
 
   it("renders all input fields", () => {
-    const { getByPlaceholderText } = render(<ProfileForm {...mockProps} />);
+    const { getByPlaceholderText, getAllByPlaceholderText } = render(
+      <ProfileForm {...mockProps} />
+    );
 
-    expect(getByPlaceholderText("John")).toBeTruthy();
-    expect(getByPlaceholderText("Doe")).toBeTruthy();
-    expect(getByPlaceholderText("+45 123456789")).toBeTruthy();
-    expect(getByPlaceholderText("johndoe@email.com")).toBeTruthy();
-    // expect(getByPlaceholderText("******")).toBeTruthy();
+    expect(getByPlaceholderText("John")).toBeTruthy(); // First Name
+    expect(getByPlaceholderText("Doe")).toBeTruthy(); // Last Name
+    expect(getByPlaceholderText("123456")).toBeTruthy(); // Phone number
+    expect(getByPlaceholderText("johndoe@email.com")).toBeTruthy(); // Email
+
+    const passwordFields = getAllByPlaceholderText("******");
+    expect(passwordFields.length).toBe(2); // Password + Confirm password
   });
 
   it("calls onChangeFirstName when typing", () => {
     const { getByPlaceholderText } = render(<ProfileForm {...mockProps} />);
     const input = getByPlaceholderText("John");
-
     fireEvent.changeText(input, "Jane");
     expect(mockProps.onChangeFirstName).toHaveBeenCalledWith("Jane");
   });
