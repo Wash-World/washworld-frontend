@@ -54,3 +54,7 @@ export type Location = {
   halls_count: number;
   image: string;
 };
+
+export type favouriteLocationDto = {
+  
+}

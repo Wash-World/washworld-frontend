@@ -6,7 +6,9 @@ type ButtonProps = {
   title: string;
   variant?: "primary" | "delete";
   disabled?: boolean;
-  onPress: (event: GestureResponderEvent) => void;
+  // onPress?: (event: GestureResponderEvent) => void;
+    onPress?: () => void; // 👈 No event expected
+
 };
 
 const Button: React.FC<ButtonProps> = ({
