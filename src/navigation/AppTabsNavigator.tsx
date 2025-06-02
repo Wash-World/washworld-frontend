@@ -17,7 +17,7 @@ export default function AppTabsNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        //added icons foe the tabs
+        //added icons for the tabs
         tabBarIcon: ({ color, size }) => {
           let iconName: React.ComponentProps<typeof Ionicons>["name"] = "home-outline";
 

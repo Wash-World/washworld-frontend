@@ -28,6 +28,7 @@ export default function SelectPlanScreen({ navigation }: Props) {
   const { data: locations = [], isLoading: locLoading } = useLocations();
 
   const [activeId, setActiveId] = useState<number | null>(null);
+
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
   const [agreeAll, setAgreeAll] = useState(false);
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-
 import WashWaitScreen from "../screens/wash/WashWaitScreen";
 import SelectWashScreen from "../screens/wash/SelectWashScreen";
 import WashInProgressScreen from "../screens/wash/WashInProgressScreen";

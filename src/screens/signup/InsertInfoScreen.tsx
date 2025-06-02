@@ -13,9 +13,8 @@ import { Ionicons } from "@expo/vector-icons";
 
 type Props = NativeStackScreenProps<SignUpStackParamList, typeof ROUTES.SIGNUP.INSERT_INFO>;
 
-export default function InsertInfoScreen({ navigation, route }: Props) {
+export default function InsertInfoScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
-  const { membership_id, assigned_location_api_id, all_locations } = route.params;
 
   // Car plate state
   const [plate, setPlate] = useState<string>("");
@@ -47,7 +46,7 @@ export default function InsertInfoScreen({ navigation, route }: Props) {
   const validatePlate = (): boolean => {
     const plateRegex = /^[A-Z]{2}\s\d{5}$/;
     if (!plateRegex.test(plate.trim())) {
-      setPlateError("Car plate must be in format: DH 12345");
+      setPlateError("Car plate must be in format: DH12345");
       return false;
     }
     setPlateError(undefined);
