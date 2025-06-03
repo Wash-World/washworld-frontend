@@ -67,9 +67,9 @@ export default function LoginScreen({ navigation }: Props) {
 
           {/* Sign In Button */}
           {status === "loading" ? (
-            <ActivityIndicator size="large" color={colors.greenBrand} style={styles.signInButton} />
+            <ActivityIndicator size="large" color={colors.greenBrand} style={styles.signInButton} testID="activity-indicator"/>
           ) : (
-            <TouchableOpacity style={styles.signInButton} onPress={handleLogin} disabled={!email || !password}>
+            <TouchableOpacity style={styles.signInButton} onPress={handleLogin} disabled={!email || !password} testID="login-button">
               <Text style={styles.signInButtonText}>Log In</Text>
             </TouchableOpacity>
           )}
